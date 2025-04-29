@@ -81,21 +81,35 @@ pip install pandas requests tqdm
 
 To run the entire processing pipeline:
 
-1.  Ensure the required input file (`fuglsortland.csv` or similar) is placed in the `databehandling/input_artsdata/` directory.
-2.  Ensure the required Excel metadata file (`ArtslisteArtnasjonal_2023_01-31.xlsx` or similar) is placed in the `databehandling/metadata_add/` directory.
+1.  ~~Ensure the required input file (`fuglsortland.csv` or similar) is placed in the `databehandling/input_artsdata/` directory.~~ (This is no longer necessary as the input file is specified as an argument).
+2.  Ensure the required Excel metadata file (e.g., `ArtslisteArtnasjonal_2023_01-31.xlsx`) exists at the location specified by the `--metadata` argument (or its default location in `databehandling/metadata_add/`).
 3.  Make sure the dependencies are installed (see Setup).
 4.  Navigate to the workspace root directory (`artsdata`) in your terminal.
-5.  Run the main script:
+5.  Run the main script, providing the path to the input CSV file as the first argument. You can optionally specify the metadata file and output directory:
 
     ```bash
-    python databehandling/behandling_main.py
+    # Basic usage (using default metadata and output directory)
+    python databehandling/behandling_main.py path/to/your/input_file.csv
+
+    # Specifying metadata file
+    python databehandling/behandling_main.py path/to/your/input_file.csv --metadata path/to/your/metadata.xlsx
+
+    # Specifying output directory
+    python databehandling/behandling_main.py path/to/your/input_file.csv --output-dir path/to/your/output
+
+    # Specifying both
+    python databehandling/behandling_main.py path/to/your/input_file.csv --metadata path/to/your/metadata.xlsx --output-dir path/to/your/output
     ```
 
-Upon successful completion, the final output file (e.g., `fuglsortland_taxonomy.csv`) will be located in the `databehandling/output/` directory, along with the intermediate files.
+    *   `input_file.csv`: **(Required)** The path to the raw CSV data you want to process.
+    *   `--metadata` (Optional): Path to the Excel file containing conservation criteria. Defaults to `databehandling/metadata_add/ArtslisteArtnasjonal_2023_01-31.xlsx` relative to the `databehandling` directory.
+    *   `--output-dir` (Optional): Directory where the intermediate and final processed files will be saved. Defaults to `databehandling/output/` relative to the `databehandling` directory.
+
+Upon successful completion, the final output file (e.g., `input_file_taxonomy.csv`) will be located in the specified output directory, along with the intermediate files (`input_file_cleaned.csv`, `input_file_processed.csv`).
 
 ## Configuration Notes
 
-*   **File Paths/Names**: Input and output filenames are configured near the top of `behandling_main.py`. Modify these if your input files have different names.
+*   **File Paths/Names**: The *input* file path is now provided via command-line argument. Default paths for metadata and output directory are set in `behandling_main.py` but can be overridden via arguments. Output filenames are generated based on the input filename stem.
 *   **Column Names**: Key column names used for merging or processing (e.g., `validScientificNameId`, `Vitenskapelig_Navn`, `individualCount`) are defined as constants or used directly in the respective `.py` files within `data_manipulasjon/`. Adjust these if the source data schema changes.
 *   **Columns to Drop**: The list of columns removed in the cleaning step is hardcoded in `cleans_columns.py`.
 *   **Criteria Columns**: The logic for identifying and renaming criteria columns (prefix `Kriterium_`, start index) is in `adds_forvaltningsinteresse.py`.

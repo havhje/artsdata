@@ -1,5 +1,6 @@
 ##### Imports #####
 import sys
+import argparse # Import argparse for command-line arguments
 from pathlib import Path
 
 # Dynamically add the script directory to sys.path to allow importing siblings
@@ -15,50 +16,42 @@ from data_manipulasjon import adds_forvaltningsinteresse
 from data_manipulasjon import api_artsdata
 
 
-##### Configuration #####
+##### Default Configuration (used if not overridden by args) #####
 
 # Define base directory relative to this script's location
-BASE_DIR = Path(__file__).parent.resolve()
-
-# Input data paths. Modify filenames if they change.
-INPUT_DIR = BASE_DIR / 'input_artsdata'
-RAW_CSV_FILENAME = 'fuglsortland.csv'
-RAW_CSV_PATH = INPUT_DIR / RAW_CSV_FILENAME  # Path to the initial raw data file.
-
-# Metadata path. Modify filename if it changes.
-METADATA_DIR = BASE_DIR / 'metadata_add'
-EXCEL_FILENAME = 'ArtslisteArtnasjonal_2023_01-31.xlsx'
-EXCEL_PATH = METADATA_DIR / EXCEL_FILENAME  # Path to the Excel metadata file.
-
-# Output directory and filenames. Modify as needed.
-OUTPUT_DIR = BASE_DIR / 'output'
-# Use the Path object RAW_CSV_PATH to get the stem
-CLEANED_CSV_FILENAME = f"{RAW_CSV_PATH.stem}_cleaned.csv" # e.g., fuglsortland_cleaned.csv
-CLEANED_CSV_PATH = OUTPUT_DIR / CLEANED_CSV_FILENAME # Intermediate cleaned file path.
-# Use the Path object RAW_CSV_PATH to get the stem
-PROCESSED_CSV_FILENAME = f"{RAW_CSV_PATH.stem}_processed.csv" # e.g., fuglsortland_processed.csv
-PROCESSED_CSV_PATH = OUTPUT_DIR / PROCESSED_CSV_FILENAME   # Intermediate after criteria add
-# Use the Path object RAW_CSV_PATH to get the stem
-FINAL_CSV_FILENAME = f"{RAW_CSV_PATH.stem}_taxonomy.csv" # e.g., fuglsortland_taxonomy.csv
-FINAL_CSV_PATH = OUTPUT_DIR / FINAL_CSV_FILENAME # Final output file path after taxonomy.
+# Used primarily for default argument calculation
+_BASE_DIR = Path(__file__).parent.resolve()
+_DEFAULT_INPUT_DIR = _BASE_DIR / 'input_artsdata'
+_DEFAULT_METADATA_DIR = _BASE_DIR / 'metadata_add'
+_DEFAULT_OUTPUT_DIR = _BASE_DIR / 'output'
+_DEFAULT_EXCEL_FILENAME = 'ArtslisteArtnasjonal_2023_01-31.xlsx'
 
 
 ##### Main Processing Logic #####
 
 ## Function: run_processing ##
-def run_processing():
+def run_processing(input_csv_path, excel_meta_path, output_dir):
     # Orchestrates the entire data cleaning and enrichment pipeline.
-    # Assumes all input files exist and output directory is creatable/writable.
+    # Takes input paths and output directory as arguments.
+    # Assumes input files exist and output directory is creatable/writable.
+
+    # --- Define intermediate/output filenames based on input --- 
+    cleaned_csv_filename = f"{input_csv_path.stem}_cleaned.csv"
+    cleaned_csv_path = output_dir / cleaned_csv_filename
+    processed_csv_filename = f"{input_csv_path.stem}_processed.csv"
+    processed_csv_path = output_dir / processed_csv_filename
+    final_csv_filename = f"{input_csv_path.stem}_taxonomy.csv"
+    final_csv_path = output_dir / final_csv_filename
 
     # --- Ensure output directory exists (Minimal side-effect) ---
     # This is a minimal deviation for usability, as the script must write output.
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True) # Creates dir if not present.
+    output_dir.mkdir(parents=True, exist_ok=True) # Creates dir if not present.
 
     # --- Step 1: Clean Columns ---
     # Calls the main function from cleans_columns script.
     # Takes raw CSV path, outputs to intermediate cleaned path.
     # Assumes cleans_columns.main returns the output path on success.
-    cleaned_path = cleans_columns.main(RAW_CSV_PATH, CLEANED_CSV_PATH)
+    cleaned_path = cleans_columns.main(input_csv_path, cleaned_csv_path)
     # Minimal check: ensure previous step returned a path (didn't fail)
     if not cleaned_path:
         # print("Error: Column cleaning step failed.")
@@ -69,9 +62,9 @@ def run_processing():
     # Takes cleaned path and Excel path, outputs to processed path.
     # Assumes adds_forvaltningsinteresse.main returns the output path on success.
     processed_path = adds_forvaltningsinteresse.main(
-        cleaned_path,  # Use the path returned by the previous step
-        EXCEL_PATH,
-        PROCESSED_CSV_PATH # Save to intermediate processed path
+        cleaned_path,       # Use the path returned by the previous step
+        excel_meta_path,    # Use the provided metadata path
+        processed_csv_path  # Save to intermediate processed path
     )
     # Minimal check
     if not processed_path:
@@ -84,7 +77,7 @@ def run_processing():
     # Assumes api_artsdata.main returns the output path on success.
     final_path = api_artsdata.main(
         processed_path, # Use the path returned by the previous step
-        FINAL_CSV_PATH
+        final_csv_path
     )
     # Minimal check
     if not final_path:
@@ -98,10 +91,44 @@ def run_processing():
 ##### Execution Entry Point #####
 
 if __name__ == "__main__":
+    # --- Argument Parsing --- 
+    parser = argparse.ArgumentParser(
+        description="Clean and enrich species observation data from Artsdatabanken."
+    )
+    # Required input file argument
+    parser.add_argument(
+        "input_file",
+        type=str,
+        help="Path to the raw input CSV file."
+    )
+    # Optional metadata file argument
+    parser.add_argument(
+        "--metadata",
+        type=str,
+        default=str(_DEFAULT_METADATA_DIR / _DEFAULT_EXCEL_FILENAME),
+        help=f"Path to the Excel metadata file (default: derived from script location)"
+    )
+    # Optional output directory argument
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=str(_DEFAULT_OUTPUT_DIR),
+        help="Directory to save the output files (default: 'output' next to script)"
+    )
+
+    args = parser.parse_args() # Parse the command-line arguments
+
+    # Convert paths from strings to Path objects
+    input_path = Path(args.input_file)
+    metadata_path = Path(args.metadata)
+    output_path_dir = Path(args.output_dir)
+
+    # --- Run Pipeline --- 
     # This block executes only when the script is run directly.
-    # It calls the main orchestration function.
+    # It calls the main orchestration function with parsed arguments.
     # print("Starting data processing pipeline...") # Keep prints minimal
-    final_output_file = run_processing()
+    final_output_file = run_processing(input_path, metadata_path, output_path_dir)
+    
     # Check if the pipeline completed (returned a file path)
     if final_output_file:
         # Print success message only if pipeline ran without returning None.
