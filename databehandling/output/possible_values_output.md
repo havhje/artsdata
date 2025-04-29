@@ -1,0 +1,1277 @@
+# Possible Values per Column
+
+## category
+
+- ``
+- `CR`
+- `EN`
+- `HI`
+- `LC`
+- `LO`
+- `NE`
+- `NR`
+- `NT`
+- `Unknown`
+- `VU`
+
+## validScientificNameId
+
+- `156989`
+- `183926`
+- `184055`
+- `185920`
+- `185969`
+- `204585`
+- `204586`
+- `204596`
+- `3454`
+- `3461`
+- `3471`
+- `3473`
+- `3479`
+- `3481`
+- `3482`
+- `3487`
+- `3491`
+- `3492`
+- `3495`
+- `3499`
+- `3500`
+- `3501`
+- `3506`
+- `3510`
+- `3516`
+- `3523`
+- `3525`
+- `3531`
+- `3536`
+- `3559`
+- `3603`
+- `3607`
+- `3611`
+- `3635`
+- `3646`
+- `3654`
+- `3664`
+- `3677`
+- `3681`
+- `3684`
+- `3694`
+- `3705`
+- `3719`
+- `3732`
+- `3745`
+- `3754`
+- `3767`
+- `3773`
+- `3776`
+- `3794`
+- `3799`
+- `3838`
+- `3840`
+- `3856`
+- `3887`
+- `3925`
+- `3935`
+- `3989`
+- `4007`
+- `4040`
+- `4066`
+- `4070`
+- `4120`
+- `4140`
+- `4158`
+- `4162`
+- `4164`
+- `4183`
+- `4198`
+- `4208`
+- `4217`
+- `4250`
+- `4252`
+- `4263`
+- `4275`
+- `4277`
+- `4322`
+- `4329`
+- `4332`
+- `4348`
+- `4365`
+- `4372`
+- `4382`
+- `4397`
+- `4400`
+- `4406`
+- `4426`
+- `4437`
+- `4472`
+- `4507`
+- `4547`
+- `4550`
+- `4557`
+- `4559`
+- `4563`
+- `4604`
+
+## validScientificName
+
+- `Acanthis flammea`
+- `Accipiter nisus`
+- `Acrocephalus schoenobaenus`
+- `Actitis hypoleucos`
+- `Alauda arvensis`
+- `Alle alle`
+- `Anas crecca`
+- `Anas platyrhynchos`
+- `Anser anser`
+- `Anser brachyrhynchus`
+- `Anser fabalis`
+- `Anser indicus`
+- `Anser rossii`
+- `Anthus pratensis`
+- `Anthus trivialis`
+- `Ardea cinerea`
+- `Asio flammeus`
+- `Aythya fuligula`
+- `Bombycilla garrulus`
+- `Branta bernicla`
+- `Branta bernicla subsp. bernicla`
+- `Branta canadensis`
+- `Branta leucopsis`
+- `Branta ruficollis`
+- `Bucephala clangula`
+- `Calidris alpina`
+- `Calidris maritima`
+- `Calidris pugnax`
+- `Cepphus grylle`
+- `Charadrius hiaticula`
+- `Chloris chloris`
+- `Cinclus cinclus`
+- `Clangula hyemalis`
+- `Columba palumbus`
+- `Corvus corax`
+- `Corvus cornix`
+- `Cuculus canorus`
+- `Cyanistes caeruleus`
+- `Cygnus cygnus`
+- `Delichon urbicum`
+- `Emberiza citrinella`
+- `Emberiza schoeniclus`
+- `Erithacus rubecula`
+- `Ficedula hypoleuca`
+- `Fratercula arctica`
+- `Fringilla coelebs`
+- `Fringilla montifringilla`
+- `Fulmarus glacialis`
+- `Gallinago gallinago`
+- `Gavia immer`
+- `Gulosus aristotelis`
+- `Haematopus ostralegus`
+- `Haliaeetus albicilla`
+- `Hirundo rustica`
+- `Lagopus lagopus`
+- `Lagopus muta`
+- `Larus argentatus`
+- `Larus canus`
+- `Larus fuscus`
+- `Larus marinus`
+- `Limosa limosa`
+- `Luscinia svecica`
+- `Mareca penelope`
+- `Melanitta fusca`
+- `Mergus merganser`
+- `Mergus serrator`
+- `Motacilla alba`
+- `Numenius arquata`
+- `Numenius phaeopus`
+- `Oenanthe oenanthe`
+- `Parus major`
+- `Passer domesticus`
+- `Passer montanus`
+- `Phalacrocorax carbo`
+- `Phylloscopus trochilus`
+- `Pica pica`
+- `Plectrophenax nivalis`
+- `Pluvialis apricaria`
+- `Poecile montanus`
+- `Prunella modularis`
+- `Pyrrhula pyrrhula`
+- `Rissa tridactyla`
+- `Somateria mollissima`
+- `Spatula clypeata`
+- `Sterna hirundo`
+- `Sterna paradisaea`
+- `Sturnus vulgaris`
+- `Tadorna tadorna`
+- `Tringa nebularia`
+- `Tringa totanus`
+- `Turdus iliacus`
+- `Turdus merula`
+- `Turdus philomelos`
+- `Turdus pilaris`
+- `Turdus torquatus`
+- `Vanellus vanellus`
+
+## preferredPopularName
+
+- ``
+- `alkekonge`
+- `bjørkefink`
+- `blåmeis`
+- `blåstrupe`
+- `bokfink`
+- `brunnakke`
+- `brushane`
+- `dompap`
+- `enkeltbekkasin`
+- `eskimogås`
+- `fiskemåke`
+- `fjellrype`
+- `fjæreplytt`
+- `fossekall`
+- `gjøk`
+- `gluttsnipe`
+- `granmeis`
+- `gravand`
+- `grågås`
+- `gråhegre`
+- `gråmåke`
+- `gråsisik`
+- `gråspurv`
+- `gråtrost`
+- `grønnfink`
+- `gulspurv`
+- `havelle`
+- `havhest`
+- `havørn`
+- `heilo`
+- `heipiplerke`
+- `hvitkinngås`
+- `islom`
+- `jernspurv`
+- `jordugle`
+- `kanadagås`
+- `kjøttmeis`
+- `kortnebbgås`
+- `krikkand`
+- `krykkje`
+- `kråke`
+- `kvinand`
+- `laksand`
+- `linerle`
+- `lirype`
+- `lunde`
+- `låvesvale`
+- `løvsanger`
+- `makrellterne`
+- `myrsnipe`
+- `måltrost`
+- `pilfink`
+- `ravn`
+- `ringdue`
+- `ringgås`
+- `ringtrost`
+- `rødhalsgås`
+- `rødnebbterne`
+- `rødstilk`
+- `rødstrupe`
+- `rødvingetrost`
+- `sandlo`
+- `sanglerke`
+- `sangsvane`
+- `sidensvans`
+- `siland`
+- `sildemåke`
+- `sivsanger`
+- `sivspurv`
+- `sjøorre`
+- `skjeand`
+- `skjære`
+- `småspove`
+- `snøspurv`
+- `spurvehauk`
+- `steinskvett`
+- `stokkand`
+- `storskarv`
+- `storspove`
+- `strandsnipe`
+- `stripegås`
+- `stær`
+- `svartbak`
+- `svarthalespove`
+- `svarthvit fluesnapper`
+- `svarttrost`
+- `taigasædgås`
+- `taksvale`
+- `teist`
+- `tjeld`
+- `toppand`
+- `toppskarv`
+- `trepiplerke`
+- `vipe`
+- `ærfugl`
+
+## taxonGroupName
+
+- `Fugler`
+
+## collector
+
+- ``
+- `Ann Britt Pilegaard-Simonsen`
+- `Arild Espelien`
+- `Arild Espelien|Ingvild Espelien`
+- `Arne Heggland`
+- `Bendik Hovstein Buhaug`
+- `Børge Klevstad`
+- `Christopher Reppe`
+- `Eirik Kristoffersen|Elisabeth Josefine Sommer`
+- `Espen Bergersen`
+- `Espen Sundet Nilsen|Morten Tjemsland`
+- `Fredrik Broms`
+- `Gjermund Andreassen`
+- `Hans Halvard Jakobsen`
+- `Helge Søgnebotten`
+- `Hugo Larsen`
+- `Inga Bendiksen`
+- `Inge Hovden`
+- `Ingunn Tombre|Johnny Bakken`
+- `Jan Olav Nybo|Ken Adelsten Jensen`
+- `Jan Olav Nybo|Ole Vignes|Jan Erik Haugen|Ken Adelsten Jensen`
+- `Johnny Bakken`
+- `Karl-Birger Strann`
+- `Karl-Birger Strann|Vigdis Frivoll`
+- `Knut Olsen|Tor Olsen`
+- `Marian Leonhardsen`
+- `Marte Sørbø Hoholm`
+- `Morten Kongsgaard`
+- `Oddvar Heggøy`
+- `Ole Lykke Henriksen`
+- `Patty Thorbergsen`
+- `Per Morten  Selle`
+- `Rune Kristiansen`
+- `Rune Kristiansen|Kurt Kristiansen`
+- `Stig  Rasmussen`
+- `Tone M. Bjørstad`
+- `Tone Mette Bjørstad`
+- `ToneM`
+- `Torger Hjalmar Ugstad`
+- `Ulf Emil Rakvaag`
+- `User 209263`
+- `User 4078`
+- `obsr1422151`
+- `obsr1994371`
+- `obsr3317920`
+- `obsr356533`
+- `Ørnulf Nielsen`
+
+## dateTimeCollected
+
+- `01.01.1986 00:00:00`
+- `01.01.1989 00:00:00`
+- `01.01.1990 00:00:00`
+- `01.01.2013 00:00:00`
+- `01.01.2018 00:00:00`
+- `01.01.2024 00:00:00`
+- `01.04.2010 00:00:00`
+- `01.05.2009 00:00:00`
+- `01.05.2014 00:00:00`
+- `01.05.2018 00:00:00`
+- `01.05.2020 00:00:00`
+- `01.06.1991 00:00:00`
+- `01.07.2021 00:00:00`
+- `01.10.2020 00:00:00`
+- `02.02.2025 00:00:00`
+- `02.04.2015 00:00:00`
+- `02.05.2019 00:00:00`
+- `02.05.2021 00:00:00`
+- `02.05.2023 00:00:00`
+- `02.06.2021 00:00:00`
+- `02.08.2018 00:00:00`
+- `02.08.2020 00:00:00`
+- `02.08.2021 00:00:00`
+- `02.10.2017 00:00:00`
+- `03.04.2020 00:00:00`
+- `03.04.2025 00:00:00`
+- `03.05.2016 00:00:00`
+- `03.05.2024 00:00:00`
+- `03.06.2014 00:00:00`
+- `03.10.2020 00:00:00`
+- `04.05.2013 00:00:00`
+- `04.05.2014 00:00:00`
+- `04.05.2021 00:00:00`
+- `05.03.2021 00:00:00`
+- `05.04.2010 00:00:00`
+- `05.04.2011 00:00:00`
+- `05.05.2014 00:00:00`
+- `05.05.2017 00:00:00`
+- `05.05.2021 00:00:00`
+- `05.05.2023 00:00:00`
+- `05.05.2024 00:00:00`
+- `05.06.2016 00:00:00`
+- `05.06.2021 00:00:00`
+- `05.08.2021 00:00:00`
+- `06.03.2016 00:00:00`
+- `06.05.2021 00:00:00`
+- `06.06.2018 00:00:00`
+- `06.06.2021 00:00:00`
+- `06.11.2021 00:00:00`
+- `07.05.2014 00:00:00`
+- `07.05.2023 00:00:00`
+- `07.06.2022 00:00:00`
+- `07.07.2022 00:00:00`
+- `07.08.2024 00:00:00`
+- `07.09.2022 00:00:00`
+- `07.09.2023 00:00:00`
+- `08.04.2021 00:00:00`
+- `08.05.2010 00:00:00`
+- `08.05.2021 00:00:00`
+- `08.06.2014 00:00:00`
+- `08.08.2021 00:00:00`
+- `08.09.2023 00:00:00`
+- `09.01.2021 00:00:00`
+- `09.04.2009 00:00:00`
+- `09.04.2017 00:00:00`
+- `09.05.2010 00:00:00`
+- `09.05.2024 00:00:00`
+- `09.06.2021 00:00:00`
+- `09.08.2023 00:00:00`
+- `09.09.2015 00:00:00`
+- `10.04.2010 00:00:00`
+- `10.04.2016 00:00:00`
+- `10.05.2019 00:00:00`
+- `10.05.2020 00:00:00`
+- `10.05.2023 00:00:00`
+- `10.08.2016 00:00:00`
+- `11.04.2020 00:00:00`
+- `11.05.2014 00:00:00`
+- `11.05.2015 00:00:00`
+- `11.05.2019 00:00:00`
+- `11.05.2021 00:00:00`
+- `11.05.2024 00:00:00`
+- `11.12.2021 00:00:00`
+- `12.04.2010 00:00:00`
+- `12.04.2017 00:00:00`
+- `12.04.2022 00:00:00`
+- `12.05.2004 00:00:00`
+- `12.05.2021 00:00:00`
+- `12.05.2023 00:00:00`
+- `12.07.2014 00:00:00`
+- `12.07.2024 00:00:00`
+- `12.10.2018 00:00:00`
+- `13.04.2011 00:00:00`
+- `13.04.2017 00:00:00`
+- `13.04.2019 00:00:00`
+- `13.05.2017 00:00:00`
+- `13.05.2019 00:00:00`
+- `13.05.2024 00:00:00`
+- `13.06.2019 00:00:00`
+- `14.05.2021 00:00:00`
+- `14.05.2023 00:00:00`
+- `14.05.2024 00:00:00`
+- `15.04.2015 00:00:00`
+- `15.05.2012 00:00:00`
+- `15.05.2016 00:00:00`
+- `15.05.2022 00:00:00`
+- `15.06.1981 00:00:00`
+- `15.06.1985 00:00:00`
+- `15.06.2014 00:00:00`
+- `15.06.2016 00:00:00`
+- `16.05.2009 00:00:00`
+- `16.05.2020 00:00:00`
+- `16.05.2023 00:00:00`
+- `17.01.2021 00:00:00`
+- `17.04.2021 00:00:00`
+- `17.05.2014 00:00:00`
+- `17.05.2015 00:00:00`
+- `17.05.2021 00:00:00`
+- `17.05.2024 00:00:00`
+- `17.06.2018 00:00:00`
+- `17.07.2019 00:00:00`
+- `17.11.2019 00:00:00`
+- `18.05.2010 00:00:00`
+- `18.05.2012 00:00:00`
+- `18.05.2014 00:00:00`
+- `18.05.2021 00:00:00`
+- `18.05.2023 00:00:00`
+- `18.05.2024 00:00:00`
+- `18.06.2023 00:00:00`
+- `19.04.2014 00:00:00`
+- `19.04.2020 00:00:00`
+- `19.05.2014 00:00:00`
+- `19.05.2020 00:00:00`
+- `19.05.2024 00:00:00`
+- `20.03.2016 00:00:00`
+- `20.04.2018 00:00:00`
+- `20.04.2021 00:00:00`
+- `20.05.2007 00:00:00`
+- `20.06.1960 00:00:00`
+- `20.06.1994 00:00:00`
+- `20.06.1995 00:00:00`
+- `20.06.1998 00:00:00`
+- `20.06.2017 00:00:00`
+- `20.06.2023 00:00:00`
+- `21.04.2014 00:00:00`
+- `21.04.2020 00:00:00`
+- `21.05.2009 00:00:00`
+- `21.05.2012 00:00:00`
+- `21.05.2023 00:00:00`
+- `22.03.2022 00:00:00`
+- `22.03.2025 00:00:00`
+- `22.05.2021 00:00:00`
+- `22.06.2014 00:00:00`
+- `23.03.2025 00:00:00`
+- `23.04.2014 00:00:00`
+- `23.04.2018 00:00:00`
+- `23.05.2010 00:00:00`
+- `23.05.2017 00:00:00`
+- `23.07.2021 00:00:00`
+- `24.04.2014 00:00:00`
+- `24.04.2021 00:00:00`
+- `24.05.2009 00:00:00`
+- `25.04.2020 00:00:00`
+- `25.05.2014 00:00:00`
+- `25.05.2015 00:00:00`
+- `25.06.2019 00:00:00`
+- `25.07.2017 00:00:00`
+- `25.07.2021 00:00:00`
+- `26.03.2021 00:00:00`
+- `26.04.2009 00:00:00`
+- `26.04.2014 00:00:00`
+- `26.04.2016 00:00:00`
+- `26.04.2024 00:00:00`
+- `26.05.2014 00:00:00`
+- `26.08.2020 00:00:00`
+- `26.09.2020 00:00:00`
+- `26.10.2024 00:00:00`
+- `27.01.2024 00:00:00`
+- `27.04.2006 00:00:00`
+- `27.04.2008 00:00:00`
+- `27.04.2013 00:00:00`
+- `27.04.2014 00:00:00`
+- `27.04.2019 00:00:00`
+- `27.05.2017 00:00:00`
+- `27.05.2020 00:00:00`
+- `28.01.2018 00:00:00`
+- `28.04.2019 00:00:00`
+- `28.04.2020 00:00:00`
+- `28.04.2021 00:00:00`
+- `28.06.1986 00:00:00`
+- `29.03.2015 00:00:00`
+- `29.04.2008 00:00:00`
+- `29.04.2020 00:00:00`
+- `29.05.1988 00:00:00`
+- `29.05.2014 00:00:00`
+- `29.07.2017 00:00:00`
+- `30.01.2021 00:00:00`
+- `30.01.2022 00:00:00`
+- `30.04.2009 00:00:00`
+- `30.04.2017 00:00:00`
+- `30.04.2023 00:00:00`
+- `30.05.2018 00:00:00`
+- `30.07.2021 00:00:00`
+- `31.03.2019 00:00:00`
+- `31.03.2021 00:00:00`
+- `31.05.2014 00:00:00`
+- `31.05.2020 00:00:00`
+- `31.07.2010 00:00:00`
+
+## locality
+
+- `542 Vesterålsveien, Nordland, NO (68.746, 15.343)`
+- `Breivika, Sortland, No`
+- `Bygdnes, Sortland, No`
+- `Bygdnes, Sortland, Sortland, No`
+- `Bygdneset, Sortland, No`
+- `Bygdneset, Sortland, Sortland, No`
+- `Greenland Sea`
+- `JEKTBOGEN - HOLTEN`
+- `Jektbogen, Sortland, No`
+- `Jektbogen, Sortland, Sortland, No`
+- `Jektbogen, Å, Sortland, No`
+- `Jektbogen-Holten`
+- `Jennestadosen, Jennestad, Sortland, No`
+- `Jennestadosen, Sandstrand, Sortland, Sortland, No`
+- `Jennestadosen, Sortland, No`
+- `Jennestadosen, Sortland, Sortland, No`
+- `Jægtbogen`
+- `Jægtbogen - Sandstrand, Sortland, No`
+- `Nordland, NO (68.75, 15.348)`
+- `SANDSTRAND`
+- `Sandstrand`
+- `Sandstrand, Sortland, No`
+- `Sandstrand, Sortland, Sortland, No`
+- `Sandstrandelva, Sortland, No`
+- `Selnes - Brenna, Sortland, No`
+- `SelnesÅnstadBygd, Sortland, No`
+- `Sortland`
+- `Sortland kommune`
+- `Sortland, Sortland, No`
+- `Sortlandssundet Bygdneset, Sortland, No`
+- `Sortlandsundet`
+- `Sortlandsundet v Bygdneset, Sortland, No`
+- `Storlibukta, Sortland, No`
+- `Verholmen`
+- `Verholmen, Å, Sortland, No`
+- `Vesterålsveien 399, Sortland NO-18 68.74272, 15.37455`
+- `Vesterålsveien, Sortland, No`
+- `jægtboge, Sortland, No`
+- `Ånstad, Sortland, No`
+- `Ånstadsjøen, Sortland, No`
+
+## coordinateUncertaintyInMeters
+
+- ``
+- `10.0`
+- `100.0`
+- `125.0`
+- `1265.0`
+- `15.0`
+- `150.0`
+- `200.0`
+- `25.0`
+- `250.0`
+- `280.0`
+- `300.0`
+- `400.0`
+- `471.0`
+- `5.0`
+- `50.0`
+- `500.0`
+- `5000.0`
+- `707.0`
+- `710.0`
+- `882.0`
+
+## municipality
+
+- `Sortland`
+
+## county
+
+- `Nordland`
+
+## individualCount
+
+- `0`
+- `1`
+- `10`
+- `100`
+- `1000`
+- `11`
+- `110`
+- `112`
+- `12`
+- `120`
+- `1200`
+- `1230`
+- `13`
+- `132`
+- `139`
+- `14`
+- `1400`
+- `15`
+- `150`
+- `1550`
+- `159`
+- `16`
+- `17`
+- `170`
+- `18`
+- `180`
+- `19`
+- `1950`
+- `2`
+- `20`
+- `200`
+- `21`
+- `210`
+- `2160`
+- `22`
+- `25`
+- `250`
+- `252`
+- `260`
+- `2650`
+- `27`
+- `274`
+- `28`
+- `280`
+- `3`
+- `30`
+- `300`
+- `31`
+- `32`
+- `33`
+- `330`
+- `34`
+- `35`
+- `360`
+- `37`
+- `380`
+- `4`
+- `40`
+- `430`
+- `434`
+- `45`
+- `450`
+- `470`
+- `48`
+- `5`
+- `50`
+- `500`
+- `52`
+- `520`
+- `550`
+- `56`
+- `580`
+- `6`
+- `60`
+- `600`
+- `62`
+- `640`
+- `650`
+- `66`
+- `68`
+- `7`
+- `70`
+- `700`
+- `7000`
+- `720`
+- `74`
+- `75`
+- `8`
+- `80`
+- `800`
+- `86`
+- `89`
+- `9`
+- `91`
+- `92`
+- `93`
+- `95`
+- `97`
+
+## basisOfRecord
+
+- `HumanObservasjon`
+- `MachineObservation`
+- `Observation`
+
+## latitude
+
+- `68,730371`
+- `68,73044`
+- `68,730508`
+- `68,730521`
+- `68,730749`
+- `68,730805`
+- `68,73118`
+- `68,73145`
+- `68,731538`
+- `68,731561`
+- `68,731906`
+- `68,73191`
+- `68,732095`
+- `68,732454`
+- `68,733926`
+- `68,73417`
+- `68,735047`
+- `68,735272`
+- `68,735305`
+- `68,735617`
+- `68,7407`
+- `68,742076`
+- `68,74272`
+- `68,742953`
+- `68,742976`
+- `68,7433`
+- `68,743852`
+- `68,744777`
+- `68,745204`
+- `68,745291`
+- `68,745363`
+- `68,746112`
+- `68,7462`
+- `68,746301`
+- `68,746396`
+- `68,746428`
+- `68,746588`
+- `68,7466`
+- `68,747184`
+- `68,747491`
+- `68,747522`
+- `68,747724`
+- `68,747825`
+- `68,748036`
+- `68,748964`
+- `68,7498`
+- `68,75`
+- `68,75015`
+- `68,750667`
+- `68,754306`
+
+## longitude
+
+- `15,313958`
+- `15,31992`
+- `15,321872`
+- `15,322088`
+- `15,322384`
+- `15,322438`
+- `15,332233`
+- `15,3338`
+- `15,334835`
+- `15,341108`
+- `15,342615`
+- `15,346567`
+- `15,346935`
+- `15,347802`
+- `15,348058`
+- `15,348347`
+- `15,35`
+- `15,354095`
+- `15,361434`
+- `15,37074`
+- `15,371297`
+- `15,371612`
+- `15,374473`
+- `15,374546`
+- `15,375268`
+- `15,379799`
+- `15,380128`
+- `15,380334`
+- `15,3831`
+- `15,392516`
+- `15,393108`
+- `15,394178`
+- `15,3953`
+- `15,395869`
+- `15,398418`
+- `15,399415`
+- `15,400627`
+- `15,401553`
+- `15,404113`
+- `15,404185`
+- `15,404625`
+- `15,404823`
+- `15,405083`
+- `15,40511`
+- `15,405119`
+- `15,405128`
+- `15,405586`
+- `15,405944999999999`
+- `15,407338`
+- `15,407778`
+
+## geometry
+
+- `POINT (512700 7626300)`
+- `POINT (512938 7627000)`
+- `POINT (513020 7626405)`
+- `POINT (513029 7626278)`
+- `POINT (513041 7626267)`
+- `POINT (513043 7626244)`
+- `POINT (513441 7625988)`
+- `POINT (513502 7626501)`
+- `POINT (513543 7626598)`
+- `POINT (513860 7626101)`
+- `POINT (514021 7626001)`
+- `POINT (514035 7626147)`
+- `POINT (514070 7626212)`
+- `POINT (514081 7626114)`
+- `POINT (514090 7626543)`
+- `POINT (514157 7626527)`
+- `POINT (514325 7626094)`
+- `POINT (514622 7626012)`
+- `POINT (515000 7625846)`
+- `POINT (515023 7625746)`
+- `POINT (515036 7625749)`
+- `POINT (515152 7625649)`
+- `POINT (515155 7625721)`
+- `POINT (515182 7625950)`
+- `POINT (515378 7626136)`
+- `POINT (515386 7626154)`
+- `POINT (515502 7625498)`
+- `POINT (515887 7624870)`
+- `POINT (515911 7624934)`
+- `POINT (515954 7624899)`
+- `POINT (515994 7625791)`
+- `POINT (516023 7624773)`
+- `POINT (516128 7624522)`
+- `POINT (516168 7624583)`
+- `POINT (516216 7624747)`
+- `POINT (516255 7624522)`
+- `POINT (516359 7624472)`
+- `POINT (516362 7624482)`
+- `POINT (516380 7624484)`
+- `POINT (516388 7624368)`
+- `POINT (516399 7624394)`
+- `POINT (516399 7624544)`
+- `POINT (516400 7624400)`
+- `POINT (516401 7624367)`
+- `POINT (516420 7624352)`
+- `POINT (516430 7624898)`
+- `POINT (516490 7624443)`
+- `POLYGON ((514557.8 7625983, 514480.4 7626001, 514420.8 7626001, 514236.2 7625983, 514111.2 7626001, 513974.3 7626060.5, 513813.5 7626138, 513646.8 7626191.5, 513480.1 7626221, 513325.3 7626233, 513212.2 7626227, 513111 7626203.5, 513051.4 7626197.5, 513003.8 7626233, 512980 7626275, 512962.1 7626334.5, 512956.2 7626406, 512980 7626453.5, 513057.4 7626495, 513206.2 7626507, 513515.8 7626477.5, 514283.9 7626322.5, 514605.4 7626227, 514641.1 7626144, 514629.2 7626084.5, 514599.5 7626013, 514557.8 7625983))`
+- `POLYGON ((515373.5 7625923.5, 515242.5 7625965, 515177 7626060.5, 515188.9 7626185.5, 515254.4 7626275, 515343.7 7626340.5, 515468.7 7626328.5, 515528.3 7626275, 515552.1 7626191.5, 515546.1 7626036.5, 515480.7 7625947.5, 515373.5 7625923.5))`
+- `POLYGON ((516358 7624668, 516389 7624166, 516777 7624247, 516358 7624668))`
+
+## scientificNameRank
+
+- `species`
+- `subspecies`
+
+## behavior
+
+- ``
+- `feeding`
+- `moving`
+- `possiblereproductive`
+- `reproductive`
+- `stationary`
+
+## notes
+
+- ``
+- `1 leucistisk hvitkinngås i flokken  Activity: Forage. Validationstatus: Approved Media`
+- `1 stk leucistisk hvitkinngås i flokk på cirka 400 individer. Activity: Forage. Validationstatus: Approved Documented`
+- `1+2+2+3+4 Activity: RecentlyFledgedYoung. Validationstatus: Approved Documented`
+- `1.ind i forgrunnen. Activity: Resting.`
+- `2 leukistiske hvitkinngjess i flokkene Activity: Forage. Validationstatus: Approved Media`
+- `2+3+4+5 Activity: RecentlyFledgedYoung. Validationstatus: Approved Documented`
+- `5 flokker observert fra Sortland sentrum til Frøskeland, 4 på ca 100 individer og en på ca 200 individer. Activity: Resting. Validationstatus: Approved Documented`
+- `Activity: AgitatedBehaviour.`
+- `Activity: AgitatedBehaviour. Validationstatus: Approved Documented`
+- `Activity: BroodOnEggs. Validationstatus: Approved Documented`
+- `Activity: Call.`
+- `Activity: Display/Song.`
+- `Activity: FlyingBy.`
+- `Activity: FlyingBy. Validationstatus: Approved Documented`
+- `Activity: Forage.`
+- `Activity: Forage. Validationstatus: Approved Documented`
+- `Activity: InNestingHabitat.`
+- `Activity: InNestingHabitat. Validationstatus: Approved Documented`
+- `Activity: Mating.`
+- `Activity: PairInSuitableHabitat.`
+- `Activity: PairInSuitableHabitat. Validationstatus: Approved Documented`
+- `Activity: RecentlyFledgedYoung.`
+- `Activity: RecentlyFledgedYoung. Validationstatus: Approved Documented`
+- `Activity: Resting.`
+- `Activity: Resting. Validationstatus: Approved Documented`
+- `Activity: Resting. Validationstatus: Approved Media`
+- `Activity: Stationary. Validationstatus: Approved Documented`
+- `Anslag. I 2 flokker Activity: Forage. Validationstatus: Approved Documented`
+- `Antall ca. Activity: Forage. Validationstatus: Approved Documented`
+- `Antall ca. Innmark. Activity: Forage.`
+- `Ca Activity: Forage.`
+- `Ca Activity: Forage. Validationstatus: Approved Documented`
+- `Ca, mot sundet. Validationstatus: Approved Documented`
+- `Ca. Innmark. Validationstatus: Approved Documented`
+- `Denne kvitkinngåsa var nesten kvit med svart nebb og svarte bein. Tatt bilde av den. Activity: Forage. Validationstatus: Report For Rrk Pending`
+- `Fordelt på flere små flokker Activity: Forage.`
+- `Gåsa var merket med en brei ring rundt halsen. Dessverre får jeg ikke til å legge ut bilde.  Activity: Resting. Validationstatus: Approved Documented`
+- `Har kommet trekkende sammen med kortnebbgjess - Activity: Resting.`
+- `I denne flokken observerte vi også ei ringgås. Activity: Forage.`
+- `I flokk med 300 hvitkinngås Activity: Forage. Validationstatus: Approved Media`
+- `I flokk med rastende hvitkinngjess - fuglen er også observert i Skottland sammen med hvitkinngjess. Activity: Resting. Validationstatus: Approved Report`
+- `Innmark Activity: Forage. Validationstatus: Approved Documented`
+- `Knuffing mellom hannene Activity: TerritoryOutsideBreeding. Validationstatus: Approved Documented`
+- `Mellom 7000 og 7500 i kveld ifølge Johnny Bakken.  Området Sandstrand - Breivik - Vik. Rastende og næringssøkende. Nye flokker kom til området i tidsperioden.. Validationstatus: Approved Media`
+- `Min.. Validationstatus: Approved Documented`
+- `Mulig 5 par Activity: Resting. Validationstatus: Approved Documented`
+- `Noen på innmark, mange på havet. Validationstatus: Approved Documented`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1986", "LastYearCount":"1991", "LastIndividualCount":"32"}"`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1986", "LastYearCount":"1998", "LastIndividualCount":"3"}"`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1986", "LastYearCount":"2007", "LastIndividualCount":"0"}"`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1986", "LastYearCount":"2007", "LastIndividualCount":"2"}"`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1986", "LastYearCount":"2007", "LastIndividualCount":"26"}"`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1988", "LastYearCount":"2007", "LastIndividualCount":"0"}"`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1991", "LastYearCount":"2007", "LastIndividualCount":"0"}"`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1992", "LastYearCount":"2007", "LastIndividualCount":"0"}"`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1994", "LastYearCount":"1998", "LastIndividualCount":"0"}"`
+- `NonValid dynamicProperties: "{"FirstYearCount":"1997", "LastYearCount":"2007", "LastIndividualCount":"0"}"`
+- `Næringsøkende og rastende. Validationstatus: Approved Documented`
+- `Observert i en liten flokk med kortnebbgås. Activity: Forage.`
+- `På havet. Validationstatus: Approved Documented`
+- `På innmark. Validationstatus: Approved Documented`
+- `Rastende sammen med hvitkinngjess - også sett tidligere i vår i Solway bay, Scotland Activity: Forage. Validationstatus: Approved Report`
+- `Sannsynligvis nærmere 1000 individer på begge sider av vegen Activity: Resting.`
+- `Snø på innmark Activity: Resting. Validationstatus: Approved Documented`
+- `Systematisk registering, MIGRAPOP-prosjektet. Validationstatus: Approved Documented`
+- `Systematisk registrering som del av NINA-prosjekt. Validationstatus: Approved Documented`
+- `Systematiske registreringer, NINA (MIGRAPOP-prosjektet). Validationstatus: Approved Documented`
+- `Systematiske registreringer, NINA-prosjekt.`
+- `Systematiske registreringer, NINA-prosjekt. Validationstatus: Approved Documented`
+- `Telt på bilde. Activity: Forage.`
+- `Utfall mot kråke Activity: AgitatedBehaviour. Validationstatus: Approved Documented`
+- `Validationstatus: Approved Documented`
+- `Vi så en flokk på ca 100 kortnebbgås,  hvorav en hadde merke rundt halsen. Activity: Forage.`
+- `Vi så til sammen minst 20 silender av begge kjønn.  En silandhunn satt på en stein i fjæra med nebbet fullt av reirmateriale.  Hannen var  i nærheten. Activity: NestBuilding.`
+- `anslag. en leukistisk  Activity: Forage. Validationstatus: Approved Media`
+- `antall ca. Activity: Forage. Validationstatus: Approved Documented`
+- `ca Activity: Forage.`
+- `ca Activity: Forage. Validationstatus: Approved Documented`
+- `ca Activity: Resting.`
+- `ca antall Activity: Resting. Validationstatus: Approved Documented`
+- `ca antall. Validationstatus: Approved Documented`
+- `ca, obs. fra bil. på havet. Validationstatus: Approved Documented`
+- `ca. Activity: Forage.`
+- `ca. Fordelt på to flere flokker Activity: Resting.`
+- `ca. Validationstatus: Approved Documented`
+- `ca. antall Activity: Forage.`
+- `ca. antall Activity: Resting.`
+- `ett ind, leukistisk. Activity: Resting.`
+- `http://www.gbif.org/occurrence/2838391685`
+- `http://www.gbif.org/occurrence/3617010767`
+- `http://www.gbif.org/occurrence/3626793975`
+- `http://www.gbif.org/occurrence/3627281334`
+- `http://www.gbif.org/occurrence/4397130871`
+- `http://www.gbif.org/occurrence/4610449546`
+- `http://www.gbif.org/occurrence/4621424757`
+- `http://www.gbif.org/occurrence/4786135583`
+- `http://www.gbif.org/occurrence/4932704622`
+- `innmark Activity: Forage. Validationstatus: Approved Documented`
+- `jaget av fiskemåker Activity: FlyingBy. Validationstatus: Approved Documented`
+- `min. 15 ad. I koloni i granplanting. Antall reir ikke tellt. Activity: VisitOccupiedNest.`
+- `min. Activity: Forage. Validationstatus: Approved Documented`
+- `minimum Activity: RecentlyFledgedYoung.`
+- `minimum Activity: Resting.`
+- `minst, grovt anslag Activity: Resting.`
+- `observert i området Selnes / Bygdnes Activity: Forage.`
+- `på snøfri innmark Activity: Forage. Validationstatus: Approved Documented`
+- `rasteområde (Behavior: feeding, Activity: Staging). Områdebeskrivelse: Viktig beiteområde for grågås og kortnebbgås under vårtrekket. Grågås bruker også disse markene under høsttrekket. Også viktig beiteområde for grågås under vårtrekket. Grågås bruker også disse markene under høsttrekket.`
+- `snøfri innmark Activity: Forage. Validationstatus: Approved Documented`
+- `yngleområde (Behavior: reproductive, Activity: Breeding). Områdebeskrivelse:  Tjeld og fiskemåke hekker i samme område. TELLING 1989: 29 PAR`
+
+## sex
+
+- ``
+- `Male`
+- `Unknown`
+- `female`
+- `female colored`
+- `in pair`
+- `male`
+- `not recorded`
+
+## Ansvarsarter
+
+- `No`
+- `Yes`
+
+## Trua arter
+
+- `No`
+- `Yes`
+
+## Andre spesielt hensynskrevende arter
+
+- `No`
+- `Yes`
+
+## Spesielle okologiske former
+
+- `No`
+
+## Prioriterte arter
+
+- `No`
+
+## Fredete arter
+
+- `No`
+
+## NT
+
+- `No`
+- `Yes`
+
+## Fremmede arter
+
+- `No`
+- `Yes`
+
+## Kingdom
+
+- `Animalia`
+
+## Phylum
+
+- `Chordata`
+
+## Class
+
+- `Aves`
+
+## Order
+
+- `Accipitriformes`
+- `Anseriformes`
+- `Charadriiformes`
+- `Columbiformes`
+- `Cuculiformes`
+- `Galliformes`
+- `Gaviiformes`
+- `Passeriformes`
+- `Pelecaniformes`
+- `Procellariiformes`
+- `Strigiformes`
+- `Suliformes`
+
+## Family
+
+- `Accipitridae`
+- `Acrocephalidae`
+- `Alaudidae`
+- `Alcidae`
+- `Anatidae`
+- `Ardeidae`
+- `Bombycillidae`
+- `Calcariidae`
+- `Charadriidae`
+- `Cinclidae`
+- `Columbidae`
+- `Corvidae`
+- `Cuculidae`
+- `Emberizidae`
+- `Fringillidae`
+- `Gaviidae`
+- `Haematopodidae`
+- `Hirundinidae`
+- `Laridae`
+- `Motacillidae`
+- `Muscicapidae`
+- `Paridae`
+- `Passeridae`
+- `Phalacrocoracidae`
+- `Phasianidae`
+- `Phylloscopidae`
+- `Procellariidae`
+- `Prunellidae`
+- `Scolopacidae`
+- `Strigidae`
+- `Sturnidae`
+- `Turdidae`
+
+## Genus
+
+- `Acanthis`
+- `Accipiter`
+- `Acrocephalus`
+- `Actitis`
+- `Alauda`
+- `Alle`
+- `Anas`
+- `Anser`
+- `Anthus`
+- `Ardea`
+- `Asio`
+- `Aythya`
+- `Bombycilla`
+- `Branta`
+- `Bucephala`
+- `Calidris`
+- `Cepphus`
+- `Charadrius`
+- `Chloris`
+- `Cinclus`
+- `Clangula`
+- `Columba`
+- `Corvus`
+- `Cuculus`
+- `Cyanistes`
+- `Cygnus`
+- `Delichon`
+- `Emberiza`
+- `Erithacus`
+- `Ficedula`
+- `Fratercula`
+- `Fringilla`
+- `Fulmarus`
+- `Gallinago`
+- `Gavia`
+- `Gulosus`
+- `Haematopus`
+- `Haliaeetus`
+- `Hirundo`
+- `Lagopus`
+- `Larus`
+- `Limosa`
+- `Luscinia`
+- `Mareca`
+- `Melanitta`
+- `Mergus`
+- `Motacilla`
+- `Numenius`
+- `Oenanthe`
+- `Parus`
+- `Passer`
+- `Phalacrocorax`
+- `Phylloscopus`
+- `Pica`
+- `Plectrophenax`
+- `Pluvialis`
+- `Poecile`
+- `Prunella`
+- `Pyrrhula`
+- `Rissa`
+- `Somateria`
+- `Spatula`
+- `Sterna`
+- `Sturnus`
+- `Tadorna`
+- `Tringa`
+- `Turdus`
+- `Vanellus`
+
+## FamilieNavn
+
+- `alkefamilien`
+- `andefamilien`
+- `bladsangerfamilien`
+- `buskspurvfamilien`
+- `duefamilien`
+- `erlefamilien`
+- `fasanfamilien`
+- `finkefamilien`
+- `fluesnapperfamilien`
+- `fossekallfamilien`
+- `gjøkfamilien`
+- `haukefamilien`
+- `hegrefamilien`
+- `jernspurvfamilien`
+- `kjerrsangerfamilien`
+- `kråkefamilien`
+- `lappspurvfamilien`
+- `lerkefamilien`
+- `lofamilien`
+- `lomfamilien`
+- `meisefamilien`
+- `måkefamilien`
+- `sidensvansfamilien`
+- `skarvefamilien`
+- `snipefamilien`
+- `spurvefamilien`
+- `stormfuglfamilien`
+- `stærfamilien`
+- `svalefamilien`
+- `tjeldfamilien`
+- `trostefamilien`
+- `uglefamilien`
+
+## OrdenNavn
+
+- `andefugler`
+- `duefugler`
+- `gjøkfugler`
+- `haukefugler`
+- `hønsefugler`
+- `lomfugler`
+- `pelikan- og hegrefugler`
+- `spurvefugler`
+- `stormfugler`
+- `sulefugler`
+- `ugler`
+- `vade-, måke- og alkefugler`
+

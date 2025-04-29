@@ -28,6 +28,7 @@ def clean_csv_columns(df):
         'institution',
         'collection',
         'datasetName',
+        'basisOfRecord',
         # Redundant coordinates
         'east',
         'north',

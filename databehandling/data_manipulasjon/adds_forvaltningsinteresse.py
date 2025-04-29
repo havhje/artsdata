@@ -63,6 +63,14 @@ def add_forvaltning_columns(
         how='left'                # Keep all rows from left (CSV)
     )
 
+    # --- Add Specific Warning for Limosa limosa ---
+    # Check if 'Limosa limosa' exists in the species column and print a warning.
+    if 'Limosa limosa' in df_merged[CSV_SPECIES_COL].values:
+        # Print warning about potential subspecies confusion.
+        print(f"WARN: Found '{CSV_SPECIES_COL}' = 'Limosa limosa'. " 
+              f"Verify if priority status applies; subspecies may differ (e.g., Limosa l. limosa).") # Notify user
+
+    # --- Fill Missing Criteria ---
     # Fill criteria columns with 'No' for species present in CSV
     # but not in Excel map.
     df_merged[criteria_cols] = df_merged[criteria_cols].fillna('No')

@@ -1,24 +1,34 @@
-"""Defines the mapping from technical column names to user-friendly display names."""
+"""Maps technical column names to user-friendly display names."""
 
 COLUMN_NAME_MAPPING = {
     # Core Identification & Biology
     "scientificName": "Vitenskapelig Navn",
     "validScientificName": "Vitenskapelig Navn",
+    "validScientificNameId": "Arts ID - Artsdatabanken",
     "vernacularName": "Norsk Navn",
-    "preferredPopularName": "Navn",
+    "preferredPopularName": "Art",
     "taxonGroupName": "Taksonomisk Gruppe",
     "scientificNameRank": "Vitenskapelig Navn Rang",
     "sex": "Kjønn",
     "individualCount": "Antall Individer",
     "behavior": "Atferd",
     "taxonRemarks": "Taksonomiske Merknader",
-    "notes": "Merknader",
+    "Kingdom": "Rike",
+    "Phylum": "Rekke",
+    "Class": "Klasse",
+    "Order": "Orden (Vitenskapelig)",
+    "Family": "Familie (Vitenskapelig)",
+    "Genus": "Slekt",
+    "FamilieNavn": "Familie",
+    "OrdenNavn": "Orden",
 
     # Event & Recording
     "eventDate": "Dato",
     "dateTimeCollected": "Innsamlingsdato/-tid",
     "recordedBy": "Registrert Av",
+    "collector": "Innsamler/Observatør",
     "basisOfRecord": "Basis for Registrering",
+    "notes": "Merknader",
 
     # Location
     "county": "Fylke",
@@ -42,11 +52,10 @@ COLUMN_NAME_MAPPING = {
 
     # Conservation & Management
     "category": "Kategori (Rødliste/Fremmedart)",
-    "is_forvaltningsinteresse": "Er art av nasjonal forvaltningsinteresse?",
-    "forvaltningsinteresse_kriterium": "Kriterium for nasjonal forvaltningsinteresse",
 
     # Add other columns from your specific dataset if needed
 }
+
 
 def get_display_name(original_name: str) -> str:
     """Return display name for a column, fallback to original if no mapping."""
