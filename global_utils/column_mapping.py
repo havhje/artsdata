@@ -1,0 +1,53 @@
+"""Defines the mapping from technical column names to user-friendly display names."""
+
+COLUMN_NAME_MAPPING = {
+    # Core Identification & Biology
+    "scientificName": "Vitenskapelig Navn",
+    "validScientificName": "Vitenskapelig Navn",
+    "vernacularName": "Norsk Navn",
+    "preferredPopularName": "Navn",
+    "taxonGroupName": "Taksonomisk Gruppe",
+    "scientificNameRank": "Vitenskapelig Navn Rang",
+    "sex": "Kjønn",
+    "individualCount": "Antall Individer",
+    "behavior": "Atferd",
+    "taxonRemarks": "Taksonomiske Merknader",
+    "notes": "Merknader",
+
+    # Event & Recording
+    "eventDate": "Dato",
+    "dateTimeCollected": "Innsamlingsdato/-tid",
+    "recordedBy": "Registrert Av",
+    "basisOfRecord": "Basis for Registrering",
+
+    # Location
+    "county": "Fylke",
+    "municipality": "Kommune",
+    "locality": "Lokalitet",
+    "decimalLatitude": "Desimalbreddegrad",
+    "decimalLongitude": "Desimallengdegrad",
+    "latitude": "Breddegrad",
+    "longitude": "Lengdegrad",
+    "lat": "Breddegrad",
+    "lon": "Lengdegrad",
+    "coordinateUncertaintyInMeters": "Koordinat Usikkerhet (meter)",
+    "geometry": "Geometri",
+
+    # Collection & Identification Details
+    "institutionCode": "Institusjonskode",
+    "collectionCode": "Samlingskode",
+    "catalogNumber": "Katalognummer",
+    "occurrenceID": "Occurrence ID",
+    "recordNumber": "Record Number",
+
+    # Conservation & Management
+    "category": "Kategori (Rødliste/Fremmedart)",
+    "is_forvaltningsinteresse": "Er art av nasjonal forvaltningsinteresse?",
+    "forvaltningsinteresse_kriterium": "Kriterium for nasjonal forvaltningsinteresse",
+
+    # Add other columns from your specific dataset if needed
+}
+
+def get_display_name(original_name: str) -> str:
+    """Return display name for a column, fallback to original if no mapping."""
+    return COLUMN_NAME_MAPPING.get(original_name, original_name)
