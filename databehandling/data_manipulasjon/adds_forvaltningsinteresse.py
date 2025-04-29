@@ -1,5 +1,5 @@
 import pandas as pd
-from pathlib import Path # Path is currently unused in minimal form
+from pathlib import Path  # Re-enabled as it will be used by the main script
 
 
 ##### Configuration #####
@@ -47,8 +47,8 @@ def add_forvaltning_columns(
         # Check if column exists before processing
         if col in df_excel_indexed.columns:
             # Convert 'X' (case-insensitive, stripped) to 'Yes', others 'No'.
-            is_x = df_excel_indexed[col].astype(str).str.strip().str.upper().eq('X')
-            df_criteria_bool[col] = is_x.map({True: 'Yes', False: 'No'})
+            is_x = df_excel_indexed[col].astype(str).str.strip().str.upper()
+            df_criteria_bool[col] = is_x.eq('X').map({True: 'Yes', False: 'No'})
         # else: # Handle missing columns if needed, currently skipped
             # print(f"Warning: Expected criteria column '{col}' not found.")
 
@@ -63,14 +63,17 @@ def add_forvaltning_columns(
         how='left'                # Keep all rows from left (CSV)
     )
 
-    # Fill criteria columns with 'No' for species present in CSV but not Excel map.
+    # Fill criteria columns with 'No' for species present in CSV
+    # but not in Excel map.
     df_merged[criteria_cols] = df_merged[criteria_cols].fillna('No')
 
     # --- Rename Criteria Columns ---
     # Create a dictionary mapping old names to new names (strip prefix)
     rename_mapping = {
+        # Strip 'Kriterium_' prefix (1st occurrence)
         col: col.replace('Kriterium_', '', 1) for col in criteria_cols
-        if col in df_merged.columns # Ensure column exists before renaming
+        # Ensure column exists in merged df before adding to mapping
+        if col in df_merged.columns
     }
     # Apply the renaming to the DataFrame.
     df_merged = df_merged.rename(columns=rename_mapping)

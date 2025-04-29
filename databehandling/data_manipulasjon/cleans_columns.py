@@ -1,6 +1,6 @@
 import pandas as pd
-# from pathlib import Path # Re-commented: Not used in minimal version without type hints
-
+from pathlib import Path
+#
 
 ##### Helper Functions #####
 
@@ -10,57 +10,57 @@ def clean_csv_columns(df):
     # Input `df` is expected to be a pandas DataFrame.
     """Removes unnecessary columns from the DataFrame."""
     # List of column names to be removed. Modify this list to change which
-    # columns are kept/removed. Adding a name removes it, removing a name keeps it.
+    # columns are kept/removed.
+    # Adding a name removes it, removing a name keeps it.
     columns_to_delete = [
         # Identifiers and internal system data
-        'proxyId', 
-        'nodeId', 
-        'institutionCode', 
+        'proxyId',
+        'nodeId',
+        'institutionCode',
         'collectionCode',
-        'datasetId', 
-        'occurrenceId', 
-        'catalogNumber', 
+        'datasetId',
+        'occurrenceId',
+        'catalogNumber',
         'otherCatalogNumbers',
-        'relatedResourceId', 
-        'relationshipOfResource', 
+        'relatedResourceId',
+        'relationshipOfResource',
         'associatedReferences',
-        'validScientificNameId',
         'institution',
         'collection',
         'datasetName',
         # Redundant coordinates
-        'east', 
+        'east',
         'north',
         # Database/metadata dates
-        'dateLastModified', 
+        'dateLastModified',
         'dateLastIdentified',
         # Data quality/system flags
-        'hasErrors', 
-        'blocked', 
-        'qualityIssue', 
+        'hasErrors',
+        'blocked',
+        'qualityIssue',
         'validated',
         # Complex/redundant fields
-        'dynamicProperties', 
+        'dynamicProperties',
         'popularNames',
         # Less commonly needed taxonomic/observation details
-        'validScientificNameAuthorship', 
-        'identifiedBy', 
+        'validScientificNameAuthorship',
+        'identifiedBy',
         'unspontaneus',
-        'unsureIdentification', 
-        'hasImage', 
-        'absent', 
+        'unsureIdentification',
+        'hasImage',
+        'absent',
         'notRecovered',
-        'habitat', 
-        'collectingMethod', 
-        'recordNumber', 
+        'habitat',
+        'collectingMethod',
+        'recordNumber',
         'fieldNumber',
-        'measurementMethod', 
-        'georeferenceRemarks', 
+        'measurementMethod',
+        'georeferenceRemarks',
         'preparations',
-        'typeStatus', 
-        'eventTime', 
+        'typeStatus',
+        'eventTime',
         'maximumElevationInMeters',
-        'minimumElevationInMeters', 
+        'minimumElevationInMeters',
         'verbatimDepth',
     ]
 
@@ -79,8 +79,8 @@ def main(raw_csv_path, cleaned_csv_path):
     # Assumes `cleaned_csv_path` is a valid path for writing.
 
     # --- Load Data (Happy Path Only) ---
-    # Reads the CSV. Assumes ';' separator. Modifying sep=';' changes delimiter.
-    # Assumes file exists and is readable.
+    # Reads the CSV. Assumes ';' separator.
+    # Modifying sep=';' changes delimiter. Assumes file exists and is readable.
     df_raw = pd.read_csv(raw_csv_path, sep=';')
 
     # --- Clean Columns ---

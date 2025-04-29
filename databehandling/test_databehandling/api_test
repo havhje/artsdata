@@ -1,0 +1,52 @@
+##### Imports #####
+import sys
+from pathlib import Path
+
+# Add the parent directory of 'databehandling' to sys.path
+# This allows importing modules from 'data_manipulasjon'
+script_dir = Path(__file__).parent.resolve()
+databehandling_dir = script_dir.parent
+project_root = databehandling_dir.parent # Assumes test_databehandling is inside databehandling
+sys.path.insert(0, str(project_root))
+
+# Import the function to test
+from databehandling.data_manipulasjon.api_artsdata import fetch_taxon_data
+import json # To pretty-print the JSON output
+
+##### Test Configuration #####
+# ID to test the API call with. 3664 is Haematopus ostralegus.
+TEST_ID = 3664
+# Add more IDs here to test other cases if needed, e.g.:
+# TEST_IDS = [3664, 12345, 99999999, 0]
+
+##### Test Execution #####
+
+## Function: run_api_test ##
+def run_api_test(taxon_id):
+    # Simple function to call the API fetcher and print results.
+    # print(f"--- Testing API fetch for scientificNameId: {taxon_id} ---")
+    
+    # Call the function under test.
+    result_data = fetch_taxon_data(taxon_id)
+    
+    # Check the result and print appropriately.
+    if result_data:
+        # print(f"Success! Received data for ID {taxon_id}:")
+        # Pretty-print the JSON dictionary for readability.
+        print(json.dumps(result_data, indent=2, ensure_ascii=False))
+    else:
+        # print(f"API call failed or returned no data for ID {taxon_id}.")
+        pass # Keep output clean in minimal version
+    
+    # print("--- Test Complete ---")
+
+
+##### Execution Entry Point #####
+
+if __name__ == "__main__":
+    # Run the test function with the configured test ID.
+    run_api_test(TEST_ID)
+    # If using a list of IDs:
+    # for tid in TEST_IDS:
+    #     run_api_test(tid)
+    #     print("\n" + "="*20 + "\n") # Separator between tests
