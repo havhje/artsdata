@@ -12,6 +12,7 @@ sys.path.insert(0, str(module_dir.parent))  # Add databehandling parent dir
 # Import the main functions from the sibling modules
 from data_manipulasjon import cleans_columns
 from data_manipulasjon import adds_forvaltningsinteresse
+from data_manipulasjon import api_artsdata
 
 
 ##### Configuration #####
@@ -31,10 +32,15 @@ EXCEL_PATH = METADATA_DIR / EXCEL_FILENAME  # Path to the Excel metadata file.
 
 # Output directory and filenames. Modify as needed.
 OUTPUT_DIR = BASE_DIR / 'output'
-CLEANED_CSV_FILENAME = f"{RAW_CSV_FILENAME.stem}_cleaned.csv" # e.g., fuglsortland_cleaned.csv
+# Use the Path object RAW_CSV_PATH to get the stem
+CLEANED_CSV_FILENAME = f"{RAW_CSV_PATH.stem}_cleaned.csv" # e.g., fuglsortland_cleaned.csv
 CLEANED_CSV_PATH = OUTPUT_DIR / CLEANED_CSV_FILENAME # Intermediate cleaned file path.
-FINAL_CSV_FILENAME = f"{RAW_CSV_FILENAME.stem}_processed.csv" # e.g., fuglsortland_processed.csv
-FINAL_CSV_PATH = OUTPUT_DIR / FINAL_CSV_FILENAME   # Final output file path.
+# Use the Path object RAW_CSV_PATH to get the stem
+PROCESSED_CSV_FILENAME = f"{RAW_CSV_PATH.stem}_processed.csv" # e.g., fuglsortland_processed.csv
+PROCESSED_CSV_PATH = OUTPUT_DIR / PROCESSED_CSV_FILENAME   # Intermediate after criteria add
+# Use the Path object RAW_CSV_PATH to get the stem
+FINAL_CSV_FILENAME = f"{RAW_CSV_PATH.stem}_taxonomy.csv" # e.g., fuglsortland_taxonomy.csv
+FINAL_CSV_PATH = OUTPUT_DIR / FINAL_CSV_FILENAME # Final output file path after taxonomy.
 
 
 ##### Main Processing Logic #####
@@ -52,17 +58,38 @@ def run_processing():
     # Calls the main function from cleans_columns script.
     # Takes raw CSV path, outputs to intermediate cleaned path.
     # Assumes cleans_columns.main returns the output path on success.
-    intermediate_path = cleans_columns.main(RAW_CSV_PATH, CLEANED_CSV_PATH)
+    cleaned_path = cleans_columns.main(RAW_CSV_PATH, CLEANED_CSV_PATH)
+    # Minimal check: ensure previous step returned a path (didn't fail)
+    if not cleaned_path:
+        # print("Error: Column cleaning step failed.")
+        return None # Stop processing
 
     # --- Step 2: Add Forvaltningsinteresse Columns ---
     # Calls the main function from adds_forvaltningsinteresse script.
-    # Takes intermediate cleaned path and Excel path, outputs to final path.
+    # Takes cleaned path and Excel path, outputs to processed path.
     # Assumes adds_forvaltningsinteresse.main returns the output path on success.
-    final_path = adds_forvaltningsinteresse.main(
-        intermediate_path,  # Use the path returned by the previous step
+    processed_path = adds_forvaltningsinteresse.main(
+        cleaned_path,  # Use the path returned by the previous step
         EXCEL_PATH,
+        PROCESSED_CSV_PATH # Save to intermediate processed path
+    )
+    # Minimal check
+    if not processed_path:
+        # print("Error: Adding forvaltningsinteresse step failed.")
+        return None # Stop processing
+
+    # --- Step 3: Add Taxonomy Columns via API ---
+    # Calls the main function from api_artsdata script.
+    # Takes processed path, outputs to final taxonomy path.
+    # Assumes api_artsdata.main returns the output path on success.
+    final_path = api_artsdata.main(
+        processed_path, # Use the path returned by the previous step
         FINAL_CSV_PATH
     )
+    # Minimal check
+    if not final_path:
+        # print("Error: Adding taxonomy step failed.")
+        return None # Stop processing
 
     # Return the final output path for potential use by a caller.
     return final_path
@@ -73,4 +100,13 @@ def run_processing():
 if __name__ == "__main__":
     # This block executes only when the script is run directly.
     # It calls the main orchestration function.
-    run_processing() # Executes the defined data processing pipeline.
+    # print("Starting data processing pipeline...") # Keep prints minimal
+    final_output_file = run_processing()
+    # Check if the pipeline completed (returned a file path)
+    if final_output_file:
+        # Print success message only if pipeline ran without returning None.
+        print(f"Pipeline completed successfully. Final output: {final_output_file}")
+    # else:
+        # print("Pipeline failed.") # Keep prints minimal
+        # Pass if failed, as individual steps might have indicated errors (future).
+        pass

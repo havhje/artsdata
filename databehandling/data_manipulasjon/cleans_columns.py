@@ -88,6 +88,16 @@ def main(raw_csv_path, cleaned_csv_path):
     # Result `cleaned_df` is a DataFrame with fewer columns.
     cleaned_df = clean_csv_columns(df_raw)
 
+    # --- Process individualCount Column ---
+    # The column is assumed to exist after the cleaning step.
+    # Fill missing values (NaN) with 1.
+    # inplace=False by default, so it returns a new Series/DataFrame.
+    cleaned_df['individualCount'] = cleaned_df['individualCount'].fillna(1)
+    # Convert the column to nullable integer type ('Int64').
+    # Using 'Int64' (capital I) handles potential NA values if needed,
+    # though fillna(1) should prevent them in this specific case.
+    cleaned_df['individualCount'] = cleaned_df['individualCount'].astype('Int64')
+
     # --- Save Result ---
     # Saves cleaned data to the specified path. Assumes path is valid/writable.
     # index=False prevents writing the DataFrame index as a column in the CSV.

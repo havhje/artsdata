@@ -1,8 +1,10 @@
 import pandas as pd
 import requests  # External library for making HTTP requests
+from tqdm import tqdm # Import tqdm for progress bar
 
 # Note: This script requires the 'requests' library.
 # Install it using: uv add requests (or pip install requests)
+# Also requires 'tqdm'. Install using: uv add tqdm
 
 
 ##### Configuration #####
@@ -113,8 +115,11 @@ def main(input_csv_path, output_csv_path):
     family_names_data = {} # Stores {species_id: 'Norwegian Family Name'}
     order_names_data = {} # Stores {species_id: 'Norwegian Order Name'}
 
-    # Loop through each unique species ID found in the input data.
-    for species_id in unique_ids:
+    # --- Loop through IDs with Progress Bar ---
+    # Wrap the unique_ids iterable with tqdm for a progress bar.
+    # `desc` sets the label, `unit` clarifies what each iteration represents.
+    print("Fetching taxonomy data from API...") # Add context print before bar
+    for species_id in tqdm(unique_ids, desc="Fetching Taxonomy", unit="ID"):
         # Convert ID to integer if necessary, handle potential errors minimally.
         try:
             current_id = int(species_id) # Ensure ID is integer type for API call.

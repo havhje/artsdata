@@ -70,8 +70,9 @@ def add_forvaltning_columns(
     # --- Rename Criteria Columns ---
     # Create a dictionary mapping old names to new names (strip prefix)
     rename_mapping = {
-        # Strip 'Kriterium_' prefix (1st occurrence)
-        col: col.replace('Kriterium_', '', 1) for col in criteria_cols
+        # Strip 'Kriterium_' prefix (1st occurrence) and replace underscores
+        col: col.replace('Kriterium_', '', 1).replace('_', ' ') 
+        for col in criteria_cols
         # Ensure column exists in merged df before adding to mapping
         if col in df_merged.columns
     }
