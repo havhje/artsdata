@@ -35,11 +35,12 @@ def fetch_taxon_data(scientific_name_id):
 
 ## Function: extract_hierarchy ##
 def extract_hierarchy(api_data):
-    # Extracts taxonomic hierarchy and Family ID from the API response data.
+    # Extracts taxonomic hierarchy, Family ID, and Order ID from API data.
     # Assumes 'higherClassification' exists and has the expected structure.
-    """Extracts hierarchy and family ID from API data dictionary."""
+    """Extracts hierarchy, family ID, and order ID from API data dictionary."""
     hierarchy = {} # Dictionary to store ranks: {RankName: ScientificName}.
     family_id = None # Variable to store the scientificNameId of the Family rank.
+    order_id = None  # Variable to store the scientificNameId of the Order rank.
     # Define the desired ranks to extract. Modify if other ranks are needed.
     desired_ranks = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus"]
 
@@ -49,32 +50,36 @@ def extract_hierarchy(api_data):
         for level in api_data['higherClassification']:
             rank = level.get('taxonRank') # Get the rank name (e.g., 'Kingdom').
             name = level.get('scientificName') # Get the scientific name for the rank.
+            current_level_id = level.get('scientificNameId') # Get the ID for this level.
             # If the rank is one we desire, store it.
             if rank in desired_ranks:
                 hierarchy[rank] = name # Store as {Rank: Name}.
             # If this level is the Family, store its scientificNameId.
             if rank == "Family":
-                family_id = level.get('scientificNameId') # Get the ID for family lookup.
+                family_id = current_level_id # Get the ID for family lookup.
+            # If this level is the Order, store its scientificNameId.
+            if rank == "Order":
+                order_id = current_level_id # Get the ID for order lookup.
 
-    # Return the extracted hierarchy dictionary and the family ID.
-    return hierarchy, family_id
+    # Return the extracted hierarchy dictionary, family ID, and order ID.
+    return hierarchy, family_id, order_id
 
 
-## Function: extract_norwegian_family_name ##
-def extract_norwegian_family_name(family_api_data):
-    # Extracts the Norwegian vernacular name for a family from API data.
+## Function: extract_norwegian_vernacular_name ##
+def extract_norwegian_vernacular_name(rank_api_data):
+    # Extracts the Norwegian vernacular name for a given rank's API data.
     # Assumes 'vernacularNames' exists. Prioritizes Bokmål ('nb').
-    """Extracts Norwegian family name from family API data dictionary."""
+    """Extracts Norwegian vernacular name from a rank's API data dictionary."""
     # Check if 'vernacularNames' key exists in the data.
-    if family_api_data and 'vernacularNames' in family_api_data:
+    if rank_api_data and 'vernacularNames' in rank_api_data:
         # Iterate through the list of vernacular names.
-        for name_info in family_api_data['vernacularNames']:
+        for name_info in rank_api_data['vernacularNames']:
             # Check if the language is Bokmål ('nb').
             if name_info.get('languageIsoCode') == 'nb':
                 # Return the Bokmål name if found.
                 return name_info.get('vernacularName')
         # If no Bokmål name, check for Nynorsk ('nn') as a fallback.
-        for name_info in family_api_data['vernacularNames']:
+        for name_info in rank_api_data['vernacularNames']:
             if name_info.get('languageIsoCode') == 'nn':
                 # Return the Nynorsk name if found.
                 return name_info.get('vernacularName')
@@ -104,8 +109,9 @@ def main(input_csv_path, output_csv_path):
 
     # --- Fetch Data from API (for unique IDs) ---
     # Dictionaries to store fetched data, keyed by species scientificNameId.
-    taxonomy_data = {} # Stores {species_id: {'Kingdom': '...', 'Phylum': '...'}}
+    taxonomy_data = {} # Stores {species_id: {'Kingdom': '...', ...}}
     family_names_data = {} # Stores {species_id: 'Norwegian Family Name'}
+    order_names_data = {} # Stores {species_id: 'Norwegian Order Name'}
 
     # Loop through each unique species ID found in the input data.
     for species_id in unique_ids:
@@ -120,8 +126,8 @@ def main(input_csv_path, output_csv_path):
         species_data = fetch_taxon_data(current_id)
         # Process the species data if the fetch was successful.
         if species_data:
-            # Extract the hierarchy and the ID of the family rank.
-            hierarchy, family_id = extract_hierarchy(species_data)
+            # Extract the hierarchy, Family ID, and Order ID.
+            hierarchy, family_id, order_id = extract_hierarchy(species_data)
             # Store the extracted hierarchy keyed by the species ID.
             taxonomy_data[current_id] = hierarchy
 
@@ -130,9 +136,18 @@ def main(input_csv_path, output_csv_path):
                 family_data = fetch_taxon_data(family_id)
                 # If family data fetched successfully, extract the Norwegian name.
                 if family_data:
-                    norwegian_name = extract_norwegian_family_name(family_data)
+                    norwegian_family_name = extract_norwegian_vernacular_name(family_data)
                     # Store the Norwegian name keyed by the original species ID.
-                    family_names_data[current_id] = norwegian_name
+                    family_names_data[current_id] = norwegian_family_name
+            
+            # If a valid order ID was found, fetch the order's data.
+            if order_id:
+                order_data = fetch_taxon_data(order_id)
+                # If order data fetched successfully, extract the Norwegian name.
+                if order_data:
+                    norwegian_order_name = extract_norwegian_vernacular_name(order_data)
+                    # Store the Norwegian name keyed by the original species ID.
+                    order_names_data[current_id] = norwegian_order_name
 
     # --- Merge API Data into DataFrame ---
     # Map the fetched hierarchy data to the corresponding rows using species ID.
@@ -148,8 +163,9 @@ def main(input_csv_path, output_csv_path):
             lambda x: x.get(rank, None) if isinstance(x, dict) else None
         )
 
-    # Map the fetched Norwegian family names to create the 'FamilieNavn' column.
+    # Map the fetched Norwegian family and order names.
     df['FamilieNavn'] = df['validScientificNameId'].map(family_names_data)
+    df['OrdenNavn'] = df['validScientificNameId'].map(order_names_data)
 
     # Remove the temporary hierarchy dictionary column.
     df = df.drop(columns=['temp_hierarchy'])

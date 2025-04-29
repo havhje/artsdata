@@ -1,6 +1,7 @@
 ##### Imports #####
 import sys
 from pathlib import Path
+import json # To pretty-print the JSON output
 
 # Add the parent directory of 'databehandling' to sys.path
 # This allows importing modules from 'data_manipulasjon'
@@ -9,9 +10,12 @@ databehandling_dir = script_dir.parent
 project_root = databehandling_dir.parent # Assumes test_databehandling is inside databehandling
 sys.path.insert(0, str(project_root))
 
-# Import the function to test
-from databehandling.data_manipulasjon.api_artsdata import fetch_taxon_data
-import json # To pretty-print the JSON output
+# Import the functions to test
+from databehandling.data_manipulasjon.api_artsdata import (
+    fetch_taxon_data,
+    extract_hierarchy,
+    extract_norwegian_vernacular_name
+)
 
 ##### Test Configuration #####
 # ID to test the API call with. 3664 is Haematopus ostralegus.
@@ -24,20 +28,68 @@ TEST_ID = 3664
 ## Function: run_api_test ##
 def run_api_test(taxon_id):
     # Simple function to call the API fetcher and print results.
-    # print(f"--- Testing API fetch for scientificNameId: {taxon_id} ---")
-    
-    # Call the function under test.
-    result_data = fetch_taxon_data(taxon_id)
-    
-    # Check the result and print appropriately.
-    if result_data:
-        # print(f"Success! Received data for ID {taxon_id}:")
-        # Pretty-print the JSON dictionary for readability.
-        print(json.dumps(result_data, indent=2, ensure_ascii=False))
-    else:
-        # print(f"API call failed or returned no data for ID {taxon_id}.")
-        pass # Keep output clean in minimal version
-    
+    # print(f"--- Testing API fetch and extraction for scientificNameId: {taxon_id} ---")
+
+    # --- Step 1: Fetch Species Data ---
+    # print(f"Fetching data for species ID: {taxon_id}...")
+    species_data = fetch_taxon_data(taxon_id)
+
+    if not species_data:
+        # print(f"Failed to fetch data for species ID {taxon_id}.")
+        return # Exit test for this ID if initial fetch fails
+
+    # print("Species data fetched successfully.")
+    # Optional: Print raw species data
+    # print("Raw Species Data:")
+    # print(json.dumps(species_data, indent=2, ensure_ascii=False))
+    # print("-"*20)
+
+    # --- Step 2: Extract Hierarchy, Family ID, and Order ID ---
+    # print("Extracting hierarchy, family ID, and order ID...")
+    # Updated to receive order_id as well
+    hierarchy, family_id, order_id = extract_hierarchy(species_data)
+
+    # print(f"Extracted Hierarchy: {hierarchy}")
+    # print(f"Extracted Family ID: {family_id}")
+    # print(f"Extracted Order ID: {order_id}")
+
+    # --- Step 3: Fetch Family Data and Extract Name ---
+    norwegian_family_name = None # Default to None
+    if family_id:
+        # print(f"Fetching data for family ID: {family_id}...")
+        family_data = fetch_taxon_data(family_id)
+        if family_data:
+            # print("Extracting Norwegian family name...")
+            # Use the generalized function
+            norwegian_family_name = extract_norwegian_vernacular_name(family_data)
+        # else:
+            # print(f"Failed to fetch data for family ID {family_id}.")
+    # else:
+        # print("Could not find Family ID in the hierarchy.")
+
+    # --- Step 4: Fetch Order Data and Extract Name ---
+    norwegian_order_name = None # Default to None
+    if order_id:
+        # print(f"Fetching data for order ID: {order_id}...")
+        order_data = fetch_taxon_data(order_id)
+        if order_data:
+            # print("Extracting Norwegian order name...")
+            # Use the generalized function
+            norwegian_order_name = extract_norwegian_vernacular_name(order_data)
+        # else:
+            # print(f"Failed to fetch data for order ID {order_id}.")
+    # else:
+        # print("Could not find Order ID in the hierarchy.")
+
+    # --- Final Output for Test --- 
+    # Print the key results together
+    print(f"Results for Species ID {taxon_id}:")
+    print(f"  Hierarchy: {hierarchy}")
+    print(f"  Family ID: {family_id}")
+    print(f"  Norwegian Family Name: {norwegian_family_name}")
+    print(f"  Order ID: {order_id}")
+    print(f"  Norwegian Order Name: {norwegian_order_name}")
+
     # print("--- Test Complete ---")
 
 
