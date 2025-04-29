@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bareleker_species_app"
+version = "0.1.0"
+description = "Species data processing and Streamlit viewer."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "pandas",
+    "openpyxl", 
+    "plotly",
+    "streamlit",
+    "matplotlib",
+    "seaborn",
+    "networkx",
+    "folium",
+    "streamlit-folium",
+    "branca",
+    "pydeck>=0.8.0",
+    "h3>=3.7.6",
+    "numpy>=1.21.0",
+]
+
+# Use find with explicit where clause
+[tool.setuptools.packages.find]
+where = ["."]  # Look for packages in the current directory (project root)
+# exclude = [...] # Can add excludes back if needed, but start simple
+
+# Keep pytest config
+[tool.pytest.ini_options]
+pythonpath = [
+"."
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-mock>=3.14.0",
+    "ruff>=0.11.6",
+]
