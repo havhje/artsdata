@@ -41,8 +41,8 @@ def calculate_yearly_metrics(data, date_col_name: str, individuals_col_name: str
 
         # Handle empty DataFrame after date conversion/dropna
         if df.empty:
-             logger.warning("DataFrame became empty after date conversion/dropping NaTs. Returning empty yearly metrics.") # Log warning.
-             return pd.DataFrame(columns=output_columns) # Return empty df.
+            logger.warning("DataFrame became empty after date conversion/dropping NaTs. Returning empty yearly metrics.") # Log warning.
+            return pd.DataFrame(columns=output_columns) # Return empty df.
 
         df['Year'] = df[date_col_name].dt.year # Extract year.
 

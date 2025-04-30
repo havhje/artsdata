@@ -68,7 +68,10 @@ def calculate_all_top_lists(data, top_n=10):
                 Sum_Individer=('Antall Individer Num', 'sum') # Sum individuals per species.
             ).reset_index() # Reset index to make 'Art' a column.
             # Get top N based on observation frequency and store.
-            top_redlist_species_by_cat[category] = agg_df.nlargest(top_n, 'Antall_Observasjoner')
+            # H FIX: Sort by Frequency DESC, then Sum DESC before taking top N
+            # top_redlist_species_by_cat[category] = agg_df.nlargest(top_n, 'Antall_Observasjoner')
+            agg_df_sorted = agg_df.sort_values(by=['Antall_Observasjoner', 'Sum_Individer'], ascending=[False, False])
+            top_redlist_species_by_cat[category] = agg_df_sorted.head(top_n)
         else:
             # Store an empty DataFrame if no data for this category.
             top_redlist_species_by_cat[category] = pd.DataFrame(columns=['Art', 'Antall_Observasjoner', 'Sum_Individer'])
@@ -84,7 +87,10 @@ def calculate_all_top_lists(data, top_n=10):
                 Sum_Individer=('Antall Individer Num', 'sum') # Sum of individuals.
             ).reset_index()
             # Get top N based on frequency and store.
-            top_alien_species_by_cat[category] = agg_df.nlargest(top_n, 'Antall_Observasjoner')
+            # H FIX: Sort by Frequency DESC, then Sum DESC before taking top N
+            # top_alien_species_by_cat[category] = agg_df.nlargest(top_n, 'Antall_Observasjoner')
+            agg_df_sorted = agg_df.sort_values(by=['Antall_Observasjoner', 'Sum_Individer'], ascending=[False, False])
+            top_alien_species_by_cat[category] = agg_df_sorted.head(top_n)
         else:
             # Store an empty DataFrame if no data for this category.
             top_alien_species_by_cat[category] = pd.DataFrame(columns=['Art', 'Antall_Observasjoner', 'Sum_Individer'])
@@ -100,7 +106,10 @@ def calculate_all_top_lists(data, top_n=10):
                 Sum_Individer=('Antall Individer Num', 'sum') # Sum of individuals.
             ).reset_index()
             # Get top N based on frequency and store.
-            top_special_species_by_col[status_col] = agg_df.nlargest(top_n, 'Antall_Observasjoner')
+            # H FIX: Sort by Frequency DESC, then Sum DESC before taking top N
+            # top_special_species_by_col[status_col] = agg_df.nlargest(top_n, 'Antall_Observasjoner')
+            agg_df_sorted = agg_df.sort_values(by=['Antall_Observasjoner', 'Sum_Individer'], ascending=[False, False])
+            top_special_species_by_col[status_col] = agg_df_sorted.head(top_n)
         else:
              # Store an empty DataFrame if no data for this status.
             top_special_species_by_col[status_col] = pd.DataFrame(columns=['Art', 'Antall_Observasjoner', 'Sum_Individer'])
