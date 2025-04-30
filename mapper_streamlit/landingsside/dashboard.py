@@ -11,6 +11,11 @@ import pandas as pd
 # Displays key metrics and top 5 lists based on the input data.
 # Assumes 'data' is a pandas DataFrame with Norwegian column names.
 def display_dashboard(data):
+    # --- Initialize Session State for Top 10 Visibility ---
+    # Ensures state persists across reruns for toggling lists.
+    if 'show_dashboard_top_lists' not in st.session_state:
+        st.session_state.show_dashboard_top_lists = False # Default: hide all top lists
+
     # --- Empty Data Check ---
     if data.empty:  # Checks if the DataFrame is empty after filtering.
         st.warning("Ingen data matcher de valgte filtrene.")  # Display warning if no data.
@@ -70,9 +75,9 @@ def display_dashboard(data):
         prioriterte_count + andre_spes_hensyn_count + ansvarsarter_count + spes_okol_former_count
     )
 
-    # --- Calculate Top 5 Lists (Removed from Display) ---
-    # Kept calculation logic in case needed later, but display is removed.
-    top_n = 5  # Number of top items.
+    # --- Calculate Top 10 Lists ---
+    # Kept calculation logic in case needed later, adjust N for Top 10.
+    top_n = 10  # Number of top items to calculate.
     # Calculate and rename columns for display clarity.
     top_species = data["Art"].value_counts().nlargest(top_n).reset_index()
     top_species.columns = ["Art", "Antall Observasjoner"]  # Set display column names.
@@ -84,7 +89,14 @@ def display_dashboard(data):
     top_observers.columns = ["Innsamler/Observatør", "Antall Observasjoner"]  # Set display column names.
 
     # --- Display Section ---
-    st.subheader("Dashboard Oversikt")  # Add a subheader for the dashboard section.
+    # Header and main toggle button side-by-side
+    header_cols = st.columns([0.8, 0.2]) # Allocate space: 80% for header, 20% for button
+    with header_cols[0]:
+        st.subheader("Dashboard Oversikt")  # Add a subheader for the dashboard section.
+    with header_cols[1]:
+        # Button to toggle all Top 10 lists in this section.
+        if st.button("Topp 10", key="toggle_all_lists"):
+             st.session_state.show_dashboard_top_lists = not st.session_state.show_dashboard_top_lists # Toggle state.
 
     # --- Main Metrics Grid ---
     # Use 5 columns
@@ -96,12 +108,32 @@ def display_dashboard(data):
         st.metric(label="Totalt Antall Individer", value=f"{total_individuals:,}")  # Display total individuals sum with formatting.
     with col3: # Content for the third column.
         st.metric(label="Unike Arter", value=f"{unique_species:,}")  # Display unique species count.
+        # Conditionally display the formatted list based on the single session state flag.
+        if st.session_state.show_dashboard_top_lists:
+            species_list_md = "" # Initialize empty markdown string.
+            # Iterate through the top species DataFrame to build the list.
+            for index, row in top_species.iterrows():
+                # Format: "1. Species Name (Count)". Add newline for list format.
+                species_list_md += f"{index + 1}. {row['Art']} ({row['Antall Observasjoner']})\n"
+            st.markdown(species_list_md) # Display the markdown list.
     with col4: # Content for the fourth column.
         st.metric(label="Unike Familier", value=f"{unique_families:,}")  # Display unique family count.
+        # Conditionally display the formatted list based on the single session state flag.
+        if st.session_state.show_dashboard_top_lists:
+            families_list_md = "" # Initialize empty markdown string.
+            for index, row in top_families.iterrows():
+                 # Format: "1. Family Name (Count)".
+                families_list_md += f"{index + 1}. {row['Familie']} ({row['Antall Observasjoner']})\n"
+            st.markdown(families_list_md) # Display the markdown list.
     with col5: # Content for the fifth column.
-        # Alien count metric removed, moved to its own section below.
-        # st.metric(label="Antall Fremmedart Funn (Risiko/Kat=Yes)", value=f"{alien_count:,}")
         st.metric(label="Unike Innsamlere/Observatører", value=f"{unique_observers:,}") # Display unique observer count here.
+        # Conditionally display the formatted list based on the single session state flag.
+        if st.session_state.show_dashboard_top_lists:
+            observers_list_md = "" # Initialize empty markdown string.
+            for index, row in top_observers.iterrows():
+                 # Format: "1. Observer Name (Count)".
+                observers_list_md += f"{index + 1}. {row['Innsamler/Observatør']} ({row['Antall Observasjoner']})\n"
+            st.markdown(observers_list_md) # Display the markdown list.
 
 
     # --- Individual Red List Category Counts ---
