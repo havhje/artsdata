@@ -28,15 +28,15 @@ def format_top_observations_md(df):
 # Formats a DataFrame (result of groupby().agg()) into a numbered markdown list.
 # Shows item name, frequency count, and sum of individuals.
 def format_top_agg_md(df, title, item_col, count_col, sum_col):
-    md_string = f"**{title}**\n" # Start with the title.
+    md_string = "**Observasjon | Sum. individ**\n" # Set fixed header
     if df.empty:
         # Append message if DataFrame is empty, using item_col to generalize.
         return md_string + f"_Ingen {item_col.lower()}er å vise._"
     # Correctly unpack iterrows() while using enumerate for numbering
     for i, (_, row_series) in enumerate(df.iterrows()): # Iterate through aggregated DataFrame rows.
-        # Format: "1. ItemName Freq obs | SumInd sum. ind.". Add newline.
+        # Format: "1. ItemName Freq | SumInd". Add newline.
         # Use replace(",", " ") for thousand separators in numbers.
-        md_string += f"{i + 1}. {row_series[item_col]} {f'{row_series[count_col]:,}'.replace(',', ' ')} obs | {f'{int(row_series[sum_col]):,}'.replace(',', ' ')} sum. ind.\n"
+        md_string += f"{i + 1}. {row_series[item_col]} {f'{row_series[count_col]:,}'.replace(',', ' ')} | {f'{int(row_series[sum_col]):,}'.replace(',', ' ')}\n"
     return md_string # Return the formatted markdown string.
 
 # --- Helper Function: format_top_frequency_md ---
@@ -198,7 +198,7 @@ def display_dashboard(data):
         st.metric(label="Totalt Antall Observasjoner", value=f"{total_records:,}")  # Display total records with formatting.
         # Conditionally display the Top 10 Species list (Frequency only)
         if st.session_state.show_dashboard_top_lists:
-            species_list_md = "**Topp 10 Arter (Hyppighet):**\n" # Title
+            species_list_md = "" # Initialize empty string, remove title
             if top_species.empty:
                 species_list_md += "_Ingen arter å vise._"
             else:
@@ -210,7 +210,7 @@ def display_dashboard(data):
         st.metric(label="Totalt Antall Individer", value=f"{total_individuals:,}")  # Display total individuals sum with formatting.
         # RE-ADD: Top 10 Observations by Individual Count display
         if st.session_state.show_dashboard_top_lists:
-            st.markdown("**Topp 10 Observasjoner (Individer):**") # Add title
+            # st.markdown("**Topp 10 Observasjoner (Individer):**") # Remove title
             st.markdown(format_top_observations_md(top_individual_obs)) # Call the formatter
     with col3: # Content for the third column.
         st.metric(label="Unike Arter", value=f"{unique_species:,}")  # Display unique species count.
@@ -218,7 +218,7 @@ def display_dashboard(data):
         st.metric(label="Unike Familier", value=f"{unique_families:,}")  # Display unique family count.
         # Conditionally display the Top 10 Families list (Frequency only)
         if st.session_state.show_dashboard_top_lists:
-            families_list_md = "**Topp 10 Familier (Hyppighet):**\n" # Title
+            families_list_md = "" # Initialize empty string, remove title
             if top_families.empty:
                 families_list_md += "_Ingen familier å vise._"
             else:
@@ -230,7 +230,7 @@ def display_dashboard(data):
         st.metric(label="Unike Innsamlere/Observatører", value=f"{unique_observers:,}") # Display unique observer count (which is an int)
         # Conditionally display the Top 10 Observers list (simple format)
         if st.session_state.show_dashboard_top_lists:
-            observers_list_md = "**Topp 10 Innsamlere (Hyppighet):**\n" # Start with title.
+            observers_list_md = "" # Initialize empty string, remove title
             if top_observers.empty:
                 observers_list_md += "_Ingen innsamlere å vise._"
             else:
