@@ -11,17 +11,18 @@ mapper_streamlit/
 └── landingsside/
     ├── dashboard.py                     # Main dashboard orchestration script
     ├── utils_dashboard/                 # Directory for dashboard utility modules
-    │   ├── __init__.py                  # (Likely present or should be added)
-    │   ├── formatting.py                # Module for formatting data into markdown
+    │   ├── __init__.py
+    │   ├── formatering_md_tekst.py      # Module for formatting data into markdown (formerly formatting.py)
     │   ├── calculations/                # Subdirectory for data calculation modules
-    │   │   ├── __init__.py              # (Likely present or should be added)
+    │   │   ├── __init__.py
     │   │   ├── calculate_basic_metrics.py # Calculates overall totals, uniques, dates
     │   │   ├── calculate_redlists_alien_forvaltning_stats.py # Calculates status counts
     │   │   └── calculate_top_lists.py     # Calculates all top 10 lists
-    │   └── display.UI/                  # Subdirectory for UI display modules
-    │       ├── __init__.py              # (Likely present or should be added)
-    │       ├── display_main_metrics_grid.py # Displays the top metrics grid and date range
-    │       └── display_status_section.py  # Displays status-based sections (RedList, Alien etc.)
+    │   └── display_UI/                  # Subdirectory for UI display modules (formerly display.UI)
+    │       ├── __init__.py
+    │       ├── display_main_metrics_grid.py # Displays the top metrics grid
+    │       ├── display_rødliste_fremmedarter_arter_av_forvaltningsinteresse.py # Displays status sections
+    │       └── display_kartleggings_info.py # Displays date range / other info
     ├── figures_dashboard/             # (Assumed) Directory potentially for static figures or plots
     │   └── ...
     └── dashboard_project_info.md      # This documentation file
@@ -30,7 +31,7 @@ mapper_streamlit/
 
 ## Workflow
 
-The primary entry point for this section is `dashboard.py`, specifically the `display_dashboard(data)` function. This function is typically called from a higher-level Streamlit application script (e.g., `app.py`).
+The primary entry point for this section is `dashboard.py`, specifically the `display_dashboard(data)` function. This function is typically called from a higher-level Streamlit application script (e.g., `Oversikt.py`).
 
 1.  **Input**: The `display_dashboard` function receives a pandas DataFrame (`data`) containing the processed observation data. This data is expected to have specific columns (e.g., 'Art', 'Antall Individer', 'Familie', 'Innsamler/Observatør', 'Kategori (Rødliste/Fremmedart)', various status columns like 'Prioriterte Arter', etc.).
 2.  **Initialization**: It checks/initializes a Streamlit session state variable (`show_dashboard_top_lists`) used to toggle the visibility of detailed Top 10 lists.
@@ -39,11 +40,11 @@ The primary entry point for this section is `dashboard.py`, specifically the `di
     *   `calculate_basic_metrics(data)`: Computes total observations, individuals, unique counts (species, families, observers), and the date range. Returns a dictionary.
     *   `calculate_all_status_counts(data)`: Computes counts for Red List categories, Alien Species categories, and other special status categories ('Prioriterte Arter', etc.). Returns a dictionary including the counts and the category lists/orders.
     *   `calculate_all_top_lists(data, top_n=10)`: Computes various Top 10 lists: by frequency (species, families, observers), by individual count (raw observations), and aggregated by category/status (species frequency and sum of individuals within Red List, Alien, Special Status categories). Returns a dictionary of pandas DataFrames.
-5.  **Formatting Setup**: It gathers the formatting functions from `utils_dashboard/formatting.py` into a dictionary to pass to display functions.
-6.  **Display Orchestration**: It sets up the main "Dashboard Oversikt" header and the "Topp 10" toggle button. It then calls functions from the `utils_dashboard/display.UI/` modules, passing the calculated data and formatting functions:
-    *   `display_main_metrics_grid(...)`: Renders the 5-column grid showing basic metrics. Conditionally displays the simple frequency Top 10 lists (Species, Families, Observers) and the Top 10 individual observations list below their respective metrics based on the session state toggle.
-    *   `display_all_status_sections(...)`: Renders the sections for Red List, Alien Species, and Special Status. Each section displays the relevant metrics per category/type. Conditionally displays the aggregated Top 10 species lists (frequency | sum individuals) below each metric based on the session state toggle, using the appropriate formatter from `formatting.py`.
-    *   `display_date_range(...)`: Renders the 'Observasjonsperiode' section showing the first and last observation dates found.
+5.  **Formatting Setup**: It gathers the formatting functions from `utils_dashboard/formatering_md_tekst.py` into a dictionary to pass to display functions.
+6.  **Display Orchestration**: It sets up the main "Dashboard Oversikt" header and the "Topp 10" toggle button. It then calls functions from the `utils_dashboard/display_UI/` modules, passing the calculated data and formatting functions:
+    *   `display_main_metrics_grid(...)`: Renders the 5-column grid showing basic metrics. Conditionally displays the Top 10 lists (Species, Families, Observers, Individual Observations) below their respective metrics based on the session state toggle. These lists use the `1. Item (Count)` format generated by `format_top_frequency_md` or `format_top_observations_md`.
+    *   `display_all_status_sections(...)`: Renders the sections for Red List, Alien Species, and Special Status. Each section displays the relevant metrics per category/type, with the category code displayed below the count. Conditionally displays the aggregated Top 10 species lists below each metric based on the session state toggle, using the `1. Item Freq | Sum` format generated by `format_top_agg_md`. Also handles displaying the single conditional header ("Observasjon | Sum. individ") for each section.
+    *   `display_kartleggings_info(...)` or similar function (likely handles `display_date_range`): Renders the 'Observasjonsperiode' section showing the first and last observation dates found.
 
 ## Setup
 
@@ -74,9 +75,9 @@ pip install streamlit pandas
 
 ## Usage
 
-The `dashboard.py` script itself is not typically run directly. Instead, its `display_dashboard(data)` function is imported and called within a main Streamlit application script (e.g., `app.py` in the project root or `mapper_streamlit` directory).
+The `dashboard.py` script itself is not typically run directly. Instead, its `display_dashboard(data)` function is imported and called within a main Streamlit application script (e.g., `Oversikt.py` in the project root).
 
-Example call within `app.py`:
+Example call within `Oversikt.py`:
 
 ```python
 import streamlit as st
@@ -86,7 +87,8 @@ from mapper_streamlit.landingsside.dashboard import display_dashboard
 # --- Load Processed Data ---
 # Assuming 'final_processed_data.csv' is the output from the databehandling pipeline
 try:
-    processed_data = pd.read_csv("path/to/your/final_processed_data.csv")
+    # Example path, adjust as needed
+    processed_data = pd.read_csv("databehandling/output/final_processed_data.csv")
 except FileNotFoundError:
     st.error("Processed data file not found.")
     st.stop() # Stop execution if data isn't available
@@ -98,10 +100,10 @@ display_dashboard(processed_data)
 # ... other Streamlit app components ...
 ```
 
-To run the Streamlit application (assuming the main script is `app.py` in the root):
+To run the Streamlit application:
 
 ```bash
-streamlit run app.py
+streamlit run Oversikt.py
 ```
 
 ## Configuration Notes
@@ -110,6 +112,7 @@ streamlit run app.py
 *   **Session State**: The visibility toggle for Top 10 lists uses `st.session_state['show_dashboard_top_lists']`.
 *   **Constants**: Status categories (`REDLIST_CATEGORIES`, `ALIEN_CATEGORIES_LIST`, `SPECIAL_STATUS_COLS`) used for calculations and display ordering are defined as constants in `utils_dashboard/calculations/calculate_redlists_alien_forvaltning_stats.py` and `utils_dashboard/calculations/calculate_top_lists.py`.
 *   **Top N**: The number of items shown in "Top" lists is hardcoded (default `top_n=10`) in the call to `calculate_all_top_lists` within `dashboard.py`.
+*   **List Formatting**: The format of the top lists is controlled by functions in `formatering_md_tekst.py`. Currently, the main grid uses `1. Item (Count)` and lower sections use `1. Item Freq | Sum`.
 
 ## Current State & Future Improvements
 
@@ -121,3 +124,4 @@ streamlit run app.py
 *   **Type Hinting & Docstrings**: Adding type hints and comprehensive docstrings to all functions would improve code clarity, maintainability, and enable static analysis.
 *   **Testing**: Adding unit tests (e.g., using `pytest`) for the calculation functions (with various sample DataFrames) and formatting functions would ensure correctness and prevent regressions. Testing Streamlit display components is more complex but could be considered.
 *   **Performance**: For very large datasets, the performance of pandas operations in the calculation steps could be profiled and potentially optimized if needed.
+*   **Linting**: Numerous linting errors (e.g., line length, spacing, unused imports) exist across the files and should be addressed for better code quality and adherence to standards like PEP 8.

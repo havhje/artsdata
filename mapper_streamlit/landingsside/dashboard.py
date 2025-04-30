@@ -1,6 +1,6 @@
 # ##### Imports #####
 import streamlit as st # Import Streamlit for app structure and widgets.
-import pandas as pd # Import pandas (needed for type checking if adding hints later).
+# pandas import removed as it's unused here now.
 
 # --- Import Local Utilities ---
 # Formatting Helpers
@@ -14,15 +14,19 @@ from .utils_dashboard.calculations.calculate_basic_metrics import calculate_basi
 from .utils_dashboard.calculations.calculate_redlists_alien_forvaltning_stats import calculate_all_status_counts
 from .utils_dashboard.calculations.calculate_top_lists import calculate_all_top_lists
 # Display Functions
-from .utils_dashboard.display_UI.display_kartleggings_info import display_main_metrics_grid, display_date_range
+# display_date_range removed from this import
+from .utils_dashboard.display_UI.display_kartleggings_info import display_main_metrics_grid
 from .utils_dashboard.display_UI.display_rødliste_fremmedarter_arter_av_forvaltningsinteresse import display_all_status_sections
+# Figure Functions (New)
+from .figures_dashboard.obs_periode_calculations import calculate_yearly_metrics # Import yearly metrics calculation.
+from .figures_dashboard.obs_periode_figur import create_observation_period_figure # Import figure creation.
 
 
 ##### Main Dashboard Function #####
 
 # --- Function: display_dashboard ---
 # Orchestrates the calculation and display of the main dashboard components.
-# Takes a pandas DataFrame 'data' containing the observation records.
+# Takes a pandas DataFrame 'data' containing the observation records (with renamed columns).
 def display_dashboard(data):
     # --- Initialize Session State for Top 10 Visibility ---
     # Ensures state persists across reruns for toggling lists via button.
@@ -41,6 +45,17 @@ def display_dashboard(data):
     status_counts = calculate_all_status_counts(data) # Returns a dictionary.
     # Calculate all top lists (frequency, individuals, aggregated)
     top_lists = calculate_all_top_lists(data, top_n=10) # Returns a dictionary of DataFrames/dicts.
+
+    # Calculate yearly metrics for the figure (New - passing column names)
+    # Define the renamed columns expected by the calculation function.
+    date_col_renamed = "Innsamlingsdato/-tid"
+    individuals_col_renamed = "Antall Individer"
+    # Call the calculation function with the data and specific column names.
+    yearly_metrics_data = calculate_yearly_metrics(
+        data, # The DataFrame (should have renamed columns).
+        date_col_name=date_col_renamed, # Pass the expected date column name.
+        individuals_col_name=individuals_col_renamed # Pass the expected individuals column name.
+    )
 
     # Package formatting functions for easy passing
     formatting_funcs = {
@@ -77,16 +92,26 @@ def display_dashboard(data):
         formatters=formatting_funcs
     )
 
-    # --- Display Observation Period ---
-    # Calls the function to render the min/max date section.
-    display_date_range(metrics=basic_metrics)
+    # --- Display Observation Period Figure (New) ---
+    # Check if yearly_metrics_data is not empty before creating/displaying the figure
+    if not yearly_metrics_data.empty:
+        # Create the figure using the calculated yearly data.
+        observation_period_fig = create_observation_period_figure(yearly_metrics_data)
+        # Display the Plotly figure using Streamlit.
+        st.plotly_chart(observation_period_fig, use_container_width=True) # Display the chart, making it fit the container width.
+    else:
+        # Optional: Display a message if no data is available for the chart
+        st.info("Ingen data tilgjengelig for observasjonsperiodefiguren etter filtrering eller databehandling.") # Inform user about missing chart data.
+
+    # --- Removed Observation Period Text Display ---
+    # display_date_range(metrics=basic_metrics) # This line is removed.
 
     # Add a final separator for visual spacing
     st.markdown("---")
 
 # ##### Main Execution Block (Optional) #####
 # if __name__ == '__main__':
-#     # Example Usage (Requires sample data loading)
-#     # sample_df = pd.DataFrame(...) # Load or create sample data
-#     # display_dashboard(sample_df)
+    # Example Usage (Requires sample data loading)
+    # sample_df = pd.DataFrame(...) # Load or create sample data
+    # display_dashboard(sample_df)
 #     pass # Keep minimal as per rules, no print statements here.
