@@ -6,19 +6,34 @@ import pandas as pd
 
 ##### Functions #####
 
-# --- Helper Function: format_top_observations_md ---
+# --- Helper Function: format_top_observations_md --- REMOVED (Covered by format_top_agg_md now)
 # Formats a DataFrame of top observations into a markdown list.
 # Assumes df has columns 'Antall Individer' and 'Art'.
-def format_top_observations_md(df):
-    md_string = "" # Initialize empty string.
+# def format_top_observations_md(df):
+#     md_string = "" # Initialize empty string.
+#     if df.empty:
+#         return "_Ingen observasjoner å vise._" # Return message if DataFrame is empty.
+#     # Ensure 'Antall Individer' is integer for display
+#     df['Antall Individer'] = pd.to_numeric(df['Antall Individer'], errors='coerce').fillna(0).astype(int)
+#     # Use enumerate to get a counter starting from 0 for correct list numbering (1-based)
+#     for i, (_, row) in enumerate(df.iterrows()): # Use enumerate for 1-based numbering
+#         # Format: "1. Count Art". Add newline.
+#         md_string += f"{i + 1}. {row['Antall Individer']:,} {row['Art']}\n" # Use counter i+1
+#     return md_string # Return the formatted markdown string.
+
+# --- Helper Function: format_top_agg_md ---
+# Formats a DataFrame (result of groupby().agg()) into a numbered markdown list.
+# Shows item name, frequency count, and sum of individuals.
+def format_top_agg_md(df, title, item_col, count_col, sum_col):
+    md_string = f"**{title}**\n" # Start with the title.
     if df.empty:
-        return "_Ingen observasjoner å vise._" # Return message if DataFrame is empty.
-    # Ensure 'Antall Individer' is integer for display
-    df['Antall Individer'] = pd.to_numeric(df['Antall Individer'], errors='coerce').fillna(0).astype(int)
-    # Use enumerate to get a counter starting from 0 for correct list numbering (1-based)
-    for i, (_, row) in enumerate(df.iterrows()): # Use enumerate for 1-based numbering
-        # Format: "1. Count Art". Add newline.
-        md_string += f"{i + 1}. {row['Antall Individer']:,} {row['Art']}\n" # Use counter i+1
+        # Append message if DataFrame is empty, using item_col to generalize.
+        return md_string + f"_Ingen {item_col.lower()}er å vise._"
+    # Correctly unpack iterrows() while using enumerate for numbering
+    for i, (_, row_series) in enumerate(df.iterrows()): # Iterate through aggregated DataFrame rows.
+        # Format: "1. ItemName Freq obs | SumInd sum. ind.". Add newline.
+        # Use replace(",", " ") for thousand separators in numbers.
+        md_string += f"{i + 1}. {row_series[item_col]} {f'{row_series[count_col]:,}'.replace(',', ' ')} obs | {f'{int(row_series[sum_col]):,}'.replace(',', ' ')} sum. ind.\n"
     return md_string # Return the formatted markdown string.
 
 # --- Helper Function: format_top_frequency_md ---
@@ -103,58 +118,67 @@ def display_dashboard(data):
 
     # --- Calculate Top 10 Lists (Frequency & Individuals) ---
     top_n = 10  # Number of top items to calculate.
-
-    # Top by Frequency (Species, Family, Observer)
-    top_species = data["Art"].value_counts().nlargest(top_n).reset_index()
-    top_species.columns = ["Art", "Antall Observasjoner"]  # Set display column names.
-    top_families = data["Familie"].value_counts().nlargest(top_n).reset_index()
-    top_families.columns = ["Familie", "Antall Observasjoner"]  # Set display column names.
-    top_observers = data["Innsamler/Observatør"].value_counts().nlargest(top_n).reset_index()
-    top_observers.columns = ["Innsamler/Observatør", "Antall Observasjoner"]  # Set display column names.
-
-    # Top by Individual Count (Overall, Redlist, Alien, Special Status)
-    # Ensure 'Antall Individer' is numeric for sorting
+    # Ensure 'Antall Individer' is numeric for calculations
     data['Antall Individer Num'] = pd.to_numeric(data['Antall Individer'], errors='coerce').fillna(0)
 
-    # Overall Top 10 Observations by Individual Count
-    top_individual_obs = data.nlargest(top_n, 'Antall Individer Num')
+    # Top Species by Frequency (with Sum Individuals)
+    top_species_agg = data.groupby('Art').agg(
+        Antall_Observasjoner=('Art', 'size'),
+        Sum_Individer=('Antall Individer Num', 'sum')
+    ).reset_index()
+    top_species_data = top_species_agg.nlargest(top_n, 'Antall_Observasjoner')
 
-    # Top 10 Redlisted Observations by Individual Count
-    redlisted_data = data[data[category_col].isin(redlist_categories)]
-    top_redlist_obs = redlisted_data.nlargest(top_n, 'Antall Individer Num')
+    # Top Families by Frequency (with Sum Individuals)
+    top_families_agg = data.groupby('Familie').agg(
+        Antall_Observasjoner=('Familie', 'size'),
+        Sum_Individer=('Antall Individer Num', 'sum')
+    ).reset_index()
+    top_families_data = top_families_agg.nlargest(top_n, 'Antall_Observasjoner')
 
-    # Top 10 Alien Observations by Individual Count
-    alien_criteria = (data[category_col].isin(alien_categories_list)) | (data[alien_yes_col] == 'Yes')
-    alien_data = data[alien_criteria]
-    top_alien_obs = alien_data.nlargest(top_n, 'Antall Individer Num')
+    # Top Observers by Frequency (Simple Count)
+    top_observers = data["Innsamler/Observatør"].value_counts().nlargest(top_n).reset_index()
+    top_observers.columns = ["Innsamler/Observatør", "Antall Observasjoner"]  # Keep existing simple structure.
 
-    # Top 10 Special Status Observations by Individual Count
-    special_status_cols = ["Prioriterte Arter", "Andre Spes. Hensyn.", "Ansvarsarter", "Spes. Økol. Former"]
-    special_criteria = data[special_status_cols].eq('Yes').any(axis=1)
-    special_data = data[special_criteria]
-    top_special_obs = special_data.nlargest(top_n, 'Antall Individer Num')
-
-    # --- Calculate Category-Specific Top 10 Species by Frequency ---
-    top_n = 10 # Define N for Top N lists.
-
-    # Red List Species Frequencies per Category
-    top_redlist_species_by_cat = {} # Dict to store series for each category.
+    # --- Calculate Category-Specific Top 10 Species (Frequency & Sum Ind.) ---
+    # Red List Species Frequencies per Category (with Sum Individuals)
+    top_redlist_species_by_cat = {} # Dict to store DataFrames for each category.
     for category in redlist_categories: # Loop through CR, EN, etc.
         category_data = data[data[category_col] == category] # Filter data for this category.
-        top_redlist_species_by_cat[category] = category_data['Art'].value_counts().nlargest(top_n) # Calc top 10 freq and store.
+        if not category_data.empty:
+            agg_df = category_data.groupby('Art').agg(
+                Antall_Observasjoner=('Art', 'size'),
+                Sum_Individer=('Antall Individer Num', 'sum')
+            ).reset_index()
+            top_redlist_species_by_cat[category] = agg_df.nlargest(top_n, 'Antall_Observasjoner') # Calc top 10 and store DF.
+        else:
+            top_redlist_species_by_cat[category] = pd.DataFrame(columns=['Art', 'Antall_Observasjoner', 'Sum_Individer']) # Store empty DF.
 
-    # Alien Species Frequencies per Category
-    top_alien_species_by_cat = {} # Dict to store series for each category.
+    # Alien Species Frequencies per Category (with Sum Individuals)
+    top_alien_species_by_cat = {} # Dict to store DataFrames for each category.
     for category in alien_categories_list: # Loop through SE, HI, etc.
         category_data = data[data[category_col] == category] # Filter data for this risk category.
-        top_alien_species_by_cat[category] = category_data['Art'].value_counts().nlargest(top_n) # Calc top 10 freq and store.
+        if not category_data.empty:
+            agg_df = category_data.groupby('Art').agg(
+                Antall_Observasjoner=('Art', 'size'),
+                Sum_Individer=('Antall Individer Num', 'sum')
+            ).reset_index()
+            top_alien_species_by_cat[category] = agg_df.nlargest(top_n, 'Antall_Observasjoner') # Calc top 10 and store DF.
+        else:
+            top_alien_species_by_cat[category] = pd.DataFrame(columns=['Art', 'Antall_Observasjoner', 'Sum_Individer']) # Store empty DF.
 
-    # Special Status Species Frequencies per Column
-    top_special_species_by_col = {} # Dict to store series for each status.
+    # Special Status Species Frequencies per Column (with Sum Individuals)
+    top_special_species_by_col = {} # Dict to store DataFrames for each status.
     special_status_cols = ["Prioriterte Arter", "Andre Spes. Hensyn.", "Ansvarsarter", "Spes. Økol. Former"]
     for status_col in special_status_cols: # Loop through the status column names.
         status_data = data[data[status_col] == 'Yes'] # Filter data where this status is 'Yes'.
-        top_special_species_by_col[status_col] = status_data['Art'].value_counts().nlargest(top_n) # Calc top 10 freq and store.
+        if not status_data.empty:
+            agg_df = status_data.groupby('Art').agg(
+                Antall_Observasjoner=('Art', 'size'),
+                Sum_Individer=('Antall Individer Num', 'sum')
+            ).reset_index()
+            top_special_species_by_col[status_col] = agg_df.nlargest(top_n, 'Antall_Observasjoner') # Calc top 10 and store DF.
+        else:
+            top_special_species_by_col[status_col] = pd.DataFrame(columns=['Art', 'Antall_Observasjoner', 'Sum_Individer']) # Store empty DF.
 
     # --- Display Section ---
     # Header and main toggle button side-by-side
@@ -172,62 +196,62 @@ def display_dashboard(data):
 
     with col1:  # Content for the first column.
         st.metric(label="Totalt Antall Observasjoner", value=f"{total_records:,}")  # Display total records with formatting.
-        # Conditionally display the Top 10 Species list (moved here)
+        # Conditionally display the Top 10 Species list with new format
         if st.session_state.show_dashboard_top_lists:
-            species_list_md = "" # Initialize empty markdown string.
-            # Iterate through the top species DataFrame to build the list.
-            for index, row in top_species.iterrows():
-                # Format: "1. Count Species Name". Add newline.
-                species_list_md += f"{index + 1}. {row['Antall Observasjoner']} {row['Art']}\n"
-            st.markdown("**Topp 10 Arter (Hyppighet):**") # Updated title
-            st.markdown(species_list_md) # Display the markdown list.
+            st.markdown(format_top_agg_md(top_species_data,
+                                          "Topp 10 Arter (Hyppighet | Sum Individer):",
+                                          item_col='Art',
+                                          count_col='Antall_Observasjoner',
+                                          sum_col='Sum_Individer'))
     with col2: # Content for the second column.
         st.metric(label="Totalt Antall Individer", value=f"{total_individuals:,}")  # Display total individuals sum with formatting.
-        # Conditionally display Top 10 Observations by Individual Count
-        if st.session_state.show_dashboard_top_lists:
-            st.markdown("**Topp 10 Observasjoner (Individer):**") # Add title
-            st.markdown(format_top_observations_md(top_individual_obs))
+        # REMOVED: Top 10 Observations by Individual Count - now integrated elsewhere
+        # if st.session_state.show_dashboard_top_lists:
+        #     st.markdown("**Topp 10 Observasjoner (Individer):**") # Add title
+        #     st.markdown(format_top_observations_md(top_individual_obs))
+        pass # Placeholder if nothing else goes here yet
     with col3: # Content for the third column.
         st.metric(label="Unike Arter", value=f"{unique_species:,}")  # Display unique species count.
     with col4: # Content for the fourth column.
         st.metric(label="Unike Familier", value=f"{unique_families:,}")  # Display unique family count.
-        # Conditionally display the formatted list based on the single session state flag.
+        # Conditionally display the Top 10 Families list with new format
         if st.session_state.show_dashboard_top_lists:
-            families_list_md = "" # Initialize empty markdown string.
-            for index, row in top_families.iterrows():
-                 # Format: "1. Count Family Name". Add newline.
-                families_list_md += f"{index + 1}. {row['Antall Observasjoner']} {row['Familie']}\n"
-            st.markdown("**Topp 10 Familier (Hyppighet):**") # Updated title
-            st.markdown(families_list_md) # Display the markdown list.
+             st.markdown(format_top_agg_md(top_families_data,
+                                           "Topp 10 Familier (Hyppighet | Sum Individer):",
+                                           item_col='Familie',
+                                           count_col='Antall_Observasjoner',
+                                           sum_col='Sum_Individer'))
     with col5: # Content for the fifth column.
-        st.metric(label="Unike Innsamlere/Observatører", value=f"{unique_observers:,}") # Display unique observer count here.
-        # Conditionally display the formatted list based on the single session state flag.
+        st.metric(label="Unike Innsamlere/Observatører", value=f"{unique_observers:,}") # Display unique observer count (which is an int)
+        # Conditionally display the Top 10 Observers list (simple format)
         if st.session_state.show_dashboard_top_lists:
-            observers_list_md = "" # Initialize empty markdown string.
-            for index, row in top_observers.iterrows():
-                 # Format: "1. Count Observer Name". Add newline.
-                observers_list_md += f"{index + 1}. {row['Antall Observasjoner']} {row['Innsamler/Observatør']}\n"
-            st.markdown("**Topp 10 Innsamlere (Hyppighet):**") # Updated title
+            observers_list_md = "**Topp 10 Innsamlere (Hyppighet):**\n" # Start with title.
+            if top_observers.empty:
+                observers_list_md += "_Ingen innsamlere å vise._"
+            else:
+                for index, row in top_observers.iterrows():
+                    # Format: "1. Count Observer Name". Add newline. Replace comma with space.
+                    # Format the count number with spaces as thousand separators first
+                    formatted_count = f'{row["Antall Observasjoner"]:,}'.replace(',', ' ')
+                    observers_list_md += f"{index + 1}. {formatted_count} {row['Innsamler/Observatør']}\n"
             st.markdown(observers_list_md) # Display the markdown list.
 
 
     # --- Individual Red List Category Counts ---
-    # st.divider() # Removed divider
-    # Section title using markdown, including the total count
     st.markdown(f"#### Antall Funn per Rødlistekategori (Totalt: {redlisted_total_count:,})")
     rl_cols = st.columns(len(redlist_categories)) # Create columns for each category (Should be 5)
     for i, category in enumerate(redlist_categories): # Iterate through categories and columns
         with rl_cols[i]: # Select the appropriate column
             # Display metric for the specific category count.
             st.metric(label=f"Antall {category}", value=f"{redlist_counts_individual[category]:,}".replace(',', ' '))
-            # Conditionally display Top 10 Species for THIS Redlist Category
+            # Conditionally display Top 10 Species for THIS Redlist Category with new format
             if st.session_state.show_dashboard_top_lists:
-                top_list_series = top_redlist_species_by_cat.get(category)
-                title = f"Topp 10 {category} Arter (Hyppighet):"
-                if top_list_series is not None and not top_list_series.empty:
-                     st.markdown(format_top_frequency_md(top_list_series, title))
-                # else: # Optionally show message if empty
-                #      st.markdown(f"**{title}**\n_Ingen arter å vise._")
+                top_list_df = top_redlist_species_by_cat.get(category)
+                title = f"Topp 10 {category} Arter (Hyppighet | Sum Ind.):"
+                st.markdown(format_top_agg_md(top_list_df, title,
+                                              item_col='Art',
+                                              count_col='Antall_Observasjoner',
+                                              sum_col='Sum_Individer'))
 
     # --- Individual Alien Species Category Counts ---
     st.markdown(f"#### Antall Funn per Fremmedartkategori (Totalt: {alien_count:,})") # Title with total alien count
@@ -240,60 +264,61 @@ def display_dashboard(data):
             count = alien_counts_individual.get(category, 0) # Get count, default to 0 if somehow missing
             label = f"Antall {category}" # Create label
             st.metric(label=label, value=f"{count:,}".replace(',', ' ')) # Display metric
-            # Conditionally display Top 10 Species for THIS Alien Category
+            # Conditionally display Top 10 Species for THIS Alien Category with new format
             if st.session_state.show_dashboard_top_lists:
-                top_list_series = top_alien_species_by_cat.get(category)
-                title = f"Topp 10 {category} Arter (Hyppighet):"
-                if top_list_series is not None and not top_list_series.empty:
-                     st.markdown(format_top_frequency_md(top_list_series, title))
-                # else: # Optionally show message if empty
-                #      st.markdown(f"**{title}**\n_Ingen arter å vise._")
+                top_list_df = top_alien_species_by_cat.get(category)
+                title = f"Topp 10 {category} Arter (Hyppighet | Sum Ind.):"
+                st.markdown(format_top_agg_md(top_list_df, title,
+                                              item_col='Art',
+                                              count_col='Antall_Observasjoner',
+                                              sum_col='Sum_Individer'))
 
     # --- Special Status Counts ---
-    # st.divider()  # Removed divider
-    # Section title using markdown, including the calculated total count
     st.markdown(f"#### Spesielle Status Markeringer (Totalt Antall 'Yes': {total_special_status_count:,})")
     # Use 5 columns for alignment
     spec_col1, spec_col2, spec_col3, spec_col4, spec_col5 = st.columns(5)
     with spec_col1:
         st.metric(label="Prioriterte Arter", value=f"{prioriterte_count:,}".replace(',', ' '))  # Display count for Prioriterte Arter.
-        # Conditionally display Top 10 Species for THIS Special Status Category
+        # Conditionally display Top 10 Species for THIS Special Status Category with new format
         if st.session_state.show_dashboard_top_lists:
-            top_list_series = top_special_species_by_col.get("Prioriterte Arter")
-            title = "Topp 10 Prioriterte Arter (Hyppighet):"
-            if top_list_series is not None and not top_list_series.empty:
-                 st.markdown(format_top_frequency_md(top_list_series, title))
-            # else: st.markdown(f"**{title}**\n_Ingen arter å vise._")
+            top_list_df = top_special_species_by_col.get("Prioriterte Arter")
+            title = "Topp 10 Prioriterte Arter (Hyppighet | Sum Ind.):"
+            st.markdown(format_top_agg_md(top_list_df, title,
+                                          item_col='Art',
+                                          count_col='Antall_Observasjoner',
+                                          sum_col='Sum_Individer'))
     with spec_col2:
         st.metric(label="Andre Spes. Hensyn", value=f"{andre_spes_hensyn_count:,}".replace(',', ' '))  # Display count for Andre Spes. Hensyn.
-        # Conditionally display Top 10 Species for THIS Special Status Category
+        # Conditionally display Top 10 Species for THIS Special Status Category with new format
         if st.session_state.show_dashboard_top_lists:
-            top_list_series = top_special_species_by_col.get("Andre Spes. Hensyn.")
-            title = "Topp 10 Andre Spes. Hensyn Arter (Hyppighet):"
-            if top_list_series is not None and not top_list_series.empty:
-                 st.markdown(format_top_frequency_md(top_list_series, title))
-            # else: st.markdown(f"**{title}**\n_Ingen arter å vise._")
+            top_list_df = top_special_species_by_col.get("Andre Spes. Hensyn.")
+            title = "Topp 10 Andre Spes. Hensyn Arter (Hyppighet | Sum Ind.):"
+            st.markdown(format_top_agg_md(top_list_df, title,
+                                          item_col='Art',
+                                          count_col='Antall_Observasjoner',
+                                          sum_col='Sum_Individer'))
     with spec_col3:
         st.metric(label="Ansvarsarter", value=f"{ansvarsarter_count:,}".replace(',', ' '))  # Display count for Ansvarsarter.
-        # Conditionally display Top 10 Species for THIS Special Status Category
+        # Conditionally display Top 10 Species for THIS Special Status Category with new format
         if st.session_state.show_dashboard_top_lists:
-            top_list_series = top_special_species_by_col.get("Ansvarsarter")
-            title = "Topp 10 Ansvarsarter (Hyppighet):"
-            if top_list_series is not None and not top_list_series.empty:
-                 st.markdown(format_top_frequency_md(top_list_series, title))
-            # else: st.markdown(f"**{title}**\n_Ingen arter å vise._")
+            top_list_df = top_special_species_by_col.get("Ansvarsarter")
+            title = "Topp 10 Ansvarsarter (Hyppighet | Sum Ind.):"
+            st.markdown(format_top_agg_md(top_list_df, title,
+                                          item_col='Art',
+                                          count_col='Antall_Observasjoner',
+                                          sum_col='Sum_Individer'))
     with spec_col4:
         st.metric(label="Spes. Økol. Former", value=f"{spes_okol_former_count:,}".replace(',', ' '))  # Display count for Spes. Økol. Former.
-        # Conditionally display Top 10 Species for THIS Special Status Category
+        # Conditionally display Top 10 Species for THIS Special Status Category with new format
         if st.session_state.show_dashboard_top_lists:
-            top_list_series = top_special_species_by_col.get("Spes. Økol. Former")
-            title = "Topp 10 Spes. Økol. Former Arter (Hyppighet):"
-            if top_list_series is not None and not top_list_series.empty:
-                 st.markdown(format_top_frequency_md(top_list_series, title))
-            # else: st.markdown(f"**{title}**\n_Ingen arter å vise._")
+            top_list_df = top_special_species_by_col.get("Spes. Økol. Former")
+            title = "Topp 10 Spes. Økol. Former Arter (Hyppighet | Sum Ind.):"
+            st.markdown(format_top_agg_md(top_list_df, title,
+                                          item_col='Art',
+                                          count_col='Antall_Observasjoner',
+                                          sum_col='Sum_Individer'))
 
     # --- Observation Period ---
-    # st.divider()  # Removed divider
     st.markdown("#### Observasjonsperiode")  # Section title using markdown
     # Use 5 columns for alignment, dates in first 2
     date_col1, date_col2, _, _, _ = st.columns(5)
