@@ -23,7 +23,7 @@ COLUMN_NAME_MAPPING = {
     "OrdenNavn": "Orden",
 
     # Event & Recording
-    "eventDate": "Dato",
+    "eventDate": "Dato", #Ikke bruk
     "dateTimeCollected": "Innsamlingsdato/-tid",
     "recordedBy": "Registrert Av",
     "collector": "Innsamler/Observatør",
@@ -52,6 +52,14 @@ COLUMN_NAME_MAPPING = {
 
     # Conservation & Management
     "category": "Kategori (Rødliste/Fremmedart)",
+    "Prioriterte arter": "Prioriterte Arter",
+    "Andre spesielt hensynskrevende arter": "Andre Spes. Hensyn.",
+    "Ansvarsarter": "Ansvarsarter",
+    "Spesielle okologiske former": "Spes. Økol. Former",
+    "Fremmede arter": "Fremmede arter kategori",
+    "Trua arter": "Truede Arter",
+    "Fredete arter": "Fredete Arter",
+    "NT": "Nær Truet (NT)",
 
     # Add other columns from your specific dataset if needed
 }

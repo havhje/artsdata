@@ -46,14 +46,22 @@ else:
 
 # --- Filter Widgets --- Display filter options in the sidebar
 display_filter_widgets(innlastet_data)
+
+# --- Apply Filters --- Apply selected filters to get the data for display
 data_for_visning = apply_filters(innlastet_data)
 
-# --- Dashboard --- Display KPIs based on the FILTERED data
+# --- Prepare Data for Dashboard ---
+# Create a copy to avoid modifying the DataFrame used elsewhere
+data_for_dashboard = data_for_visning.copy()
+# Rename columns for display in the dashboard using the mapping function
+data_for_dashboard.columns = [get_display_name(col) for col in data_for_dashboard.columns]
+
+# --- Dashboard --- Display KPIs based on the FILTERED and RENAMED data
 st.subheader("KPI Oversikt")  # Add a subheader for the dashboard
-display_dashboard(data_for_visning)  # Call the dashboard function with filtered data
+display_dashboard(data_for_dashboard)  # Call the dashboard function with the RENAMED data
 
 # --- Define Alien Species Criteria ---
-# Define columns and identifiers used for filtering (assuming columns exist in original data)
+# Define columns and identifiers used for filtering (using ORIGINAL names on data_for_visning)
 alien_col = "Fremmede arter"           # Original column name for the dedicated alien flag
 category_col = "category"             # Original column name for Red List / Alien Risk category
 alien_identifier = "Yes"            # Value indicating alien species in alien_col
