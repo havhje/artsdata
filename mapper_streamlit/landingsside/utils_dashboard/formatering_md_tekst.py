@@ -15,10 +15,10 @@ def format_top_observations_md(df):
     df_display['Antall Individer Display'] = pd.to_numeric(df_display['Antall Individer Num'], errors='coerce').fillna(0).astype(int) # Convert to integer, handling potential errors.
     # Use enumerate to get a counter starting from 0 for correct list numbering (1-based)
     for i, (_, row) in enumerate(df_display.iterrows()): # Use enumerate for 1-based numbering
-        # Format: "1. Count Art". Add newline. Use replace for thousands.
+        # Format: "1. Art (Count)". Add newline. Use replace for thousands.
         # Pre-format the count number with spaces as thousand separators
         formatted_count = f'{row["Antall Individer Display"]:,}'.replace(',', ' ') # Format number with spaces.
-        md_string += f"{i + 1}. {formatted_count} {row['Art']}\n" # Append formatted string.
+        md_string += f"{i + 1}. {row['Art']} ({formatted_count})\n" # NEW Format: 1. Item (Count)
     return md_string # Return the formatted markdown string.
 
 # --- Helper Function: format_top_agg_md ---
@@ -50,15 +50,16 @@ def format_top_frequency_md(data, title, item_col=None, count_col=None):
         if data.empty:
             return md_string + "_Ingen data å vise._" # Generic empty message for series.
         for i, (item, count) in enumerate(data.items()): # Iterate through series items.
-            # Format: "1. Count Item". Add newline. Replace comma with space.
+            # Format: "1. Item (Count)". Add newline. Replace comma with space.
             formatted_count = f'{count:,}'.replace(',', ' ') # Format count.
-            md_string += f"{i + 1}. {formatted_count} {item}\n" # Append formatted string.
+            md_string += f"{i + 1}. {item} ({formatted_count})\n" # NEW Format: 1. Item (Count)
     elif isinstance(data, pd.DataFrame) and item_col and count_col: # Check if input is DataFrame with specified columns
         if data.empty:
             return md_string + "_Ingen data å vise._" # Generic empty message for DataFrame.
         for i, row in data.iterrows(): # Iterate through DataFrame rows.
+            # Format: "1. ItemName (Count)". Add newline. Replace comma with space.
             formatted_count = f'{row[count_col]:,}'.replace(',', ' ') # Format count from column.
-            md_string += f"{i + 1}. {formatted_count} {row[item_col]}\n" # Append formatted string using specified columns.
+            md_string += f"{i + 1}. {row[item_col]} ({formatted_count})\n" # NEW Format: 1. Item (Count)
     else:
         return md_string + "_Ugyldig input eller manglende kolonner._" # Handle invalid input.
 
