@@ -23,7 +23,7 @@ def display_dashboard(data):
     total_individuals = pd.to_numeric(data["Antall Individer"], errors='coerce').fillna(0).astype(int).sum()
     unique_species = data["Art"].nunique()  # Count unique species names.
     unique_families = data["Familie"].nunique()  # Count unique family names.
-    unique_observers = data["Innsamler/Observatør"].nunique()  # Count unique observers.
+    unique_observers = data["Innsamler/Observatør"].nunique()  # Re-enabled calculation for display.
 
     # Date Range
     # Convert to datetime, coercing errors to NaT (Not a Time).
@@ -44,15 +44,31 @@ def display_dashboard(data):
         # Count rows where the category column exactly matches the current category.
         redlist_counts_individual[category] = (data["Kategori (Rødliste/Fremmedart)"] == category).sum()
 
-    alien_categories = ['SE', 'HI', 'PH', 'LO']  # Define specific alien risk categories.
-    is_alien_category = data["Kategori (Rødliste/Fremmedart)"].isin(alien_categories)  # Check category column.
-    is_alien_yes = data["Fremmede arter kategori"] == 'Yes'  # Check dedicated 'Yes' column.
-    alien_count = (is_alien_category | is_alien_yes).sum()  # Count if either condition is true.
+    # --- Calculate Alien Species Counts (Total and Breakdown) ---
+    alien_categories_list = ['SE', 'HI', 'PH', 'LO']  # Define specific alien risk categories.
+    alien_yes_col = "Fremmede arter kategori" # Define the dedicated 'Yes' column name.
+    category_col = "Kategori (Rødliste/Fremmedart)" # Define the category column name.
 
+    is_alien_category = data[category_col].isin(alien_categories_list)  # Check category column.
+    is_alien_yes = data[alien_yes_col] == 'Yes'  # Check dedicated 'Yes' column.
+    alien_count = (is_alien_category | is_alien_yes).sum()  # Total alien count.
+
+    # Calculate counts for each breakdown category
+    alien_counts_individual = {} # Dictionary to store breakdown counts.
+    for category in alien_categories_list: # Iterate through risk categories.
+        alien_counts_individual[category] = (data[category_col] == category).sum() # Count matches in category column.
+
+    # --- Calculate Other Status Counts ---
     prioriterte_count = (data["Prioriterte Arter"] == 'Yes').sum()  # Count 'Yes' in Prioriterte Arter.
     andre_spes_hensyn_count = (data["Andre Spes. Hensyn."] == 'Yes').sum()  # Count 'Yes' in Andre Spes. Hensyn.
     ansvarsarter_count = (data["Ansvarsarter"] == 'Yes').sum()  # Count 'Yes' in Ansvarsarter.
     spes_okol_former_count = (data["Spes. Økol. Former"] == 'Yes').sum()  # Count 'Yes' in Spes. Økol. Former.
+
+    # --- Calculate Total for Special Status ---
+    # Sum the individual 'Yes' counts for the title display.
+    total_special_status_count = (
+        prioriterte_count + andre_spes_hensyn_count + ansvarsarter_count + spes_okol_former_count
+    )
 
     # --- Calculate Top 5 Lists (Removed from Display) ---
     # Kept calculation logic in case needed later, but display is removed.
@@ -71,63 +87,67 @@ def display_dashboard(data):
     st.subheader("Dashboard Oversikt")  # Add a subheader for the dashboard section.
 
     # --- Main Metrics Grid ---
-    col1, col2, col3 = st.columns(3)  # Creates 3 columns. Adjust number for different layouts.
+    # Use 5 columns
+    col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:  # Content for the first column.
         st.metric(label="Totalt Antall Observasjoner", value=f"{total_records:,}")  # Display total records with formatting.
+    with col2: # Content for the second column.
         st.metric(label="Totalt Antall Individer", value=f"{total_individuals:,}")  # Display total individuals sum with formatting.
-        # Display TOTAL redlisted count. Category list defined above.
-
-    with col2:  # Content for the second column.
+    with col3: # Content for the third column.
         st.metric(label="Unike Arter", value=f"{unique_species:,}")  # Display unique species count.
+    with col4: # Content for the fourth column.
         st.metric(label="Unike Familier", value=f"{unique_families:,}")  # Display unique family count.
-        # --- Expander Removed ---
-        # with st.expander(f"Topp {top_n} Arter"):  # Creates an expandable section below the metric.
-        #     # Display top species table within expander.
-        #     st.dataframe(top_species, use_container_width=True, hide_index=True)
+    with col5: # Content for the fifth column.
+        # Alien count metric removed, moved to its own section below.
+        # st.metric(label="Antall Fremmedart Funn (Risiko/Kat=Yes)", value=f"{alien_count:,}")
+        st.metric(label="Unike Innsamlere/Observatører", value=f"{unique_observers:,}") # Display unique observer count here.
 
-        # Display alien species count. Logic defined above.
-
-    with col3:  # Content for the third column.
-        st.metric(label="Totalt Antall Rødlistede Funn (CR-DD)", value=f"{redlisted_total_count:,}") # Updated label slightly
-        st.metric(label="Antall Fremmedart Funn (Risiko/Kat=Yes)", value=f"{alien_count:,}")
-        # --- Expander Removed ---
-        # with st.expander(f"Topp {top_n} Familier"):  # Expandable section for top families.
-        #     st.dataframe(top_families, use_container_width=True, hide_index=True)  # Display top families table.
-
-        #st.metric(label="Unike Innsamlere/Observatører", value=f"{unique_observers:,}")  # Display unique observer count.
-        # --- Expander Removed ---
-        # with st.expander(f"Topp {top_n} Innsamlere/Observatører"):  # Expandable section for top observers.
-        #     # Display top observers table.
-        #     st.dataframe(top_observers, use_container_width=True, hide_index=True)
 
     # --- Individual Red List Category Counts ---
-    st.divider() # Add separator
-    st.write("**Antall Funn per Rødlistekategori**") # Section title
-    rl_cols = st.columns(len(redlist_categories)) # Create columns for each category
+    # st.divider() # Removed divider
+    # Section title using markdown, including the total count
+    st.markdown(f"#### Antall Funn per Rødlistekategori (Totalt: {redlisted_total_count:,})")
+    rl_cols = st.columns(len(redlist_categories)) # Create columns for each category (Should be 5)
     for i, category in enumerate(redlist_categories): # Iterate through categories and columns
         with rl_cols[i]: # Select the appropriate column
             # Display metric for the specific category count.
             st.metric(label=f"Antall {category}", value=f"{redlist_counts_individual[category]:,}")
 
+    # --- Individual Alien Species Category Counts ---
+    st.markdown(f"#### Antall Funn per Fremmedartkategori (Totalt: {alien_count:,})") # Title with total alien count
+    # Display only the risk categories (SE, HI, PH, LO)
+    alien_breakdown_categories = alien_categories_list # Use the list of risk categories directly
+    # Use 5 columns for alignment, categories will fill first 4
+    fa_cols = st.columns(5)
+    for i, category in enumerate(alien_breakdown_categories): # Iterate through the 4 categories
+        with fa_cols[i]: # Place in columns 0, 1, 2, 3
+            count = alien_counts_individual.get(category, 0) # Get count, default to 0 if somehow missing
+            label = f"Antall {category}" # Create label
+            st.metric(label=label, value=f"{count:,}") # Display metric
+
+
     # --- Special Status Counts ---
-    st.divider()  # Adds a visual separator line.
-    st.write("**Spesielle Status Markeringer (Antall 'Yes')**")  # Add a title for this section.
-    col_prio, col_hensyn, col_ansvar, col_okol = st.columns(4)  # Create 4 columns for status counts.
-    with col_prio:
+    # st.divider()  # Removed divider
+    # Section title using markdown, including the calculated total count
+    st.markdown(f"#### Spesielle Status Markeringer (Totalt Antall 'Yes': {total_special_status_count:,})")
+    # Use 5 columns for alignment
+    spec_col1, spec_col2, spec_col3, spec_col4, spec_col5 = st.columns(5)
+    with spec_col1:
         st.metric(label="Prioriterte Arter", value=f"{prioriterte_count:,}")  # Display count for Prioriterte Arter.
-    with col_hensyn:
+    with spec_col2:
         st.metric(label="Andre Spes. Hensyn", value=f"{andre_spes_hensyn_count:,}")  # Display count for Andre Spes. Hensyn.
-    with col_ansvar:
+    with spec_col3:
         st.metric(label="Ansvarsarter", value=f"{ansvarsarter_count:,}")  # Display count for Ansvarsarter.
-    with col_okol:
+    with spec_col4:
         st.metric(label="Spes. Økol. Former", value=f"{spes_okol_former_count:,}")  # Display count for Spes. Økol. Former.
+    # spec_col5 remains empty
 
     # --- Observation Period ---
-    st.divider()  # Adds another visual separator.
-    st.write("**Observasjonsperiode**")  # Add a title for the time period section.
-    # Display min/max dates. Handle cases where dates might be None.
-    date_col1, date_col2 = st.columns(2)  # Create two columns for dates.
+    # st.divider()  # Removed divider
+    st.markdown("#### Observasjonsperiode")  # Section title using markdown
+    # Use 5 columns for alignment, dates in first 2
+    date_col1, date_col2, _, _, _ = st.columns(5)
     with date_col1:
         # Format min date or show message.
         min_date_str = min_date.strftime('%Y-%m-%d') if min_date else "Ingen gyldig dato funnet"
