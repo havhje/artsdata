@@ -43,7 +43,7 @@ def display_all_status_sections(status_counts, top_lists, show_top_lists, format
     for i, category in enumerate(redlist_categories): # Iterate through categories and columns.
         count = status_counts['redlist_breakdown'].get(category, 0) # Get count for this category.
         top_list_df = top_lists['top_redlist_species_agg'].get(category) # Get corresponding top list DataFrame.
-        label = f"Antall {category}" # Create label for metric.
+        label = category # NEW: Use category code directly as label.
         _display_single_status_category(rl_cols[i], label, count, top_list_df, show_top_lists, format_agg) # Call helper to display metric and list.
 
     # --- Individual Alien Species Category Counts Section ---
@@ -64,7 +64,7 @@ def display_all_status_sections(status_counts, top_lists, show_top_lists, format
     for i, category in enumerate(alien_categories): # Iterate through the risk categories.
         count = status_counts['alien_breakdown'].get(category, 0) # Get count for this category.
         top_list_df = top_lists['top_alien_species_agg'].get(category) # Get corresponding top list DataFrame.
-        label = f"Antall {category}" # Create label for metric.
+        label = category # NEW: Use category code directly as label.
         # Ensure we only use the number of columns created for metrics (usually 4 for aliens)
         if i < len(fa_cols):
             _display_single_status_category(fa_cols[i], label, count, top_list_df, show_top_lists, format_agg) # Call helper.
