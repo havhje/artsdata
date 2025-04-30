@@ -4,7 +4,7 @@ import pandas as pd # Import pandas (needed for type checking if adding hints la
 
 # --- Import Local Utilities ---
 # Formatting Helpers
-from .utils_dashboard.formatting import (
+from .utils_dashboard.formatering_md_tekst import (
     format_top_observations_md,
     format_top_agg_md,
     format_top_frequency_md
@@ -14,8 +14,8 @@ from .utils_dashboard.calculations.calculate_basic_metrics import calculate_basi
 from .utils_dashboard.calculations.calculate_redlists_alien_forvaltning_stats import calculate_all_status_counts
 from .utils_dashboard.calculations.calculate_top_lists import calculate_all_top_lists
 # Display Functions
-from .utils_dashboard.display_UI.display_main_metrics_grid import display_main_metrics_grid, display_date_range
-from .utils_dashboard.display_UI.display_status_section import display_all_status_sections
+from .utils_dashboard.display_UI.display_kartleggings_info import display_main_metrics_grid, display_date_range
+from .utils_dashboard.display_UI.display_rødliste_fremmedarter_arter_av_forvaltningsinteresse import display_all_status_sections
 
 
 ##### Main Dashboard Function #####
