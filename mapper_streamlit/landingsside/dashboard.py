@@ -6,9 +6,24 @@ import pandas as pd
 
 ##### Functions #####
 
+# --- Helper Function: format_top_observations_md ---
+# Formats a DataFrame of top observations into a markdown list.
+# Assumes df has columns 'Antall Individer' and 'Art'.
+def format_top_observations_md(df):
+    md_string = "" # Initialize empty string.
+    if df.empty:
+        return "_Ingen observasjoner å vise._" # Return message if DataFrame is empty.
+    # Ensure 'Antall Individer' is integer for display
+    df['Antall Individer'] = pd.to_numeric(df['Antall Individer'], errors='coerce').fillna(0).astype(int)
+    # Use enumerate to get a counter starting from 0 for correct list numbering (1-based)
+    for i, (_, row) in enumerate(df.iterrows()): # Use enumerate for 1-based numbering
+        # Format: "1. Count Art". Add newline.
+        md_string += f"{i + 1}. {row['Antall Individer']:,} {row['Art']}\n" # Use counter i+1
+    return md_string # Return the formatted markdown string.
+
 
 # --- Function: display_dashboard ---
-# Displays key metrics and top 5 lists based on the input data.
+# Displays key metrics and top 10 lists based on the input data.
 # Assumes 'data' is a pandas DataFrame with Norwegian column names.
 def display_dashboard(data):
     # --- Initialize Session State for Top 10 Visibility ---
@@ -75,18 +90,38 @@ def display_dashboard(data):
         prioriterte_count + andre_spes_hensyn_count + ansvarsarter_count + spes_okol_former_count
     )
 
-    # --- Calculate Top 10 Lists ---
-    # Kept calculation logic in case needed later, adjust N for Top 10.
+    # --- Calculate Top 10 Lists (Frequency & Individuals) ---
     top_n = 10  # Number of top items to calculate.
-    # Calculate and rename columns for display clarity.
+
+    # Top by Frequency (Species, Family, Observer)
     top_species = data["Art"].value_counts().nlargest(top_n).reset_index()
     top_species.columns = ["Art", "Antall Observasjoner"]  # Set display column names.
-
     top_families = data["Familie"].value_counts().nlargest(top_n).reset_index()
     top_families.columns = ["Familie", "Antall Observasjoner"]  # Set display column names.
-
     top_observers = data["Innsamler/Observatør"].value_counts().nlargest(top_n).reset_index()
     top_observers.columns = ["Innsamler/Observatør", "Antall Observasjoner"]  # Set display column names.
+
+    # Top by Individual Count (Overall, Redlist, Alien, Special Status)
+    # Ensure 'Antall Individer' is numeric for sorting
+    data['Antall Individer Num'] = pd.to_numeric(data['Antall Individer'], errors='coerce').fillna(0)
+
+    # Overall Top 10 Observations by Individual Count
+    top_individual_obs = data.nlargest(top_n, 'Antall Individer Num')
+
+    # Top 10 Redlisted Observations by Individual Count
+    redlisted_data = data[data[category_col].isin(redlist_categories)]
+    top_redlist_obs = redlisted_data.nlargest(top_n, 'Antall Individer Num')
+
+    # Top 10 Alien Observations by Individual Count
+    alien_criteria = (data[category_col].isin(alien_categories_list)) | (data[alien_yes_col] == 'Yes')
+    alien_data = data[alien_criteria]
+    top_alien_obs = alien_data.nlargest(top_n, 'Antall Individer Num')
+
+    # Top 10 Special Status Observations by Individual Count
+    special_status_cols = ["Prioriterte Arter", "Andre Spes. Hensyn.", "Ansvarsarter", "Spes. Økol. Former"]
+    special_criteria = data[special_status_cols].eq('Yes').any(axis=1)
+    special_data = data[special_criteria]
+    top_special_obs = special_data.nlargest(top_n, 'Antall Individer Num')
 
     # --- Display Section ---
     # Header and main toggle button side-by-side
@@ -104,26 +139,32 @@ def display_dashboard(data):
 
     with col1:  # Content for the first column.
         st.metric(label="Totalt Antall Observasjoner", value=f"{total_records:,}")  # Display total records with formatting.
-    with col2: # Content for the second column.
-        st.metric(label="Totalt Antall Individer", value=f"{total_individuals:,}")  # Display total individuals sum with formatting.
-    with col3: # Content for the third column.
-        st.metric(label="Unike Arter", value=f"{unique_species:,}")  # Display unique species count.
-        # Conditionally display the formatted list based on the single session state flag.
+        # Conditionally display the Top 10 Species list (moved here)
         if st.session_state.show_dashboard_top_lists:
             species_list_md = "" # Initialize empty markdown string.
             # Iterate through the top species DataFrame to build the list.
             for index, row in top_species.iterrows():
-                # Format: "1. Species Name (Count)". Add newline for list format.
-                species_list_md += f"{index + 1}. {row['Art']} ({row['Antall Observasjoner']})\n"
+                # Format: "1. Count Species Name". Add newline.
+                species_list_md += f"{index + 1}. {row['Antall Observasjoner']} {row['Art']}\n"
+            st.markdown("**Topp 10 Arter (Hyppighet):**") # Updated title
             st.markdown(species_list_md) # Display the markdown list.
+    with col2: # Content for the second column.
+        st.metric(label="Totalt Antall Individer", value=f"{total_individuals:,}")  # Display total individuals sum with formatting.
+        # Conditionally display Top 10 Observations by Individual Count
+        if st.session_state.show_dashboard_top_lists:
+            st.markdown("**Topp 10 Observasjoner (Individer):**") # Add title
+            st.markdown(format_top_observations_md(top_individual_obs))
+    with col3: # Content for the third column.
+        st.metric(label="Unike Arter", value=f"{unique_species:,}")  # Display unique species count.
     with col4: # Content for the fourth column.
         st.metric(label="Unike Familier", value=f"{unique_families:,}")  # Display unique family count.
         # Conditionally display the formatted list based on the single session state flag.
         if st.session_state.show_dashboard_top_lists:
             families_list_md = "" # Initialize empty markdown string.
             for index, row in top_families.iterrows():
-                 # Format: "1. Family Name (Count)".
-                families_list_md += f"{index + 1}. {row['Familie']} ({row['Antall Observasjoner']})\n"
+                 # Format: "1. Count Family Name". Add newline.
+                families_list_md += f"{index + 1}. {row['Antall Observasjoner']} {row['Familie']}\n"
+            st.markdown("**Topp 10 Familier (Hyppighet):**") # Updated title
             st.markdown(families_list_md) # Display the markdown list.
     with col5: # Content for the fifth column.
         st.metric(label="Unike Innsamlere/Observatører", value=f"{unique_observers:,}") # Display unique observer count here.
@@ -131,8 +172,9 @@ def display_dashboard(data):
         if st.session_state.show_dashboard_top_lists:
             observers_list_md = "" # Initialize empty markdown string.
             for index, row in top_observers.iterrows():
-                 # Format: "1. Observer Name (Count)".
-                observers_list_md += f"{index + 1}. {row['Innsamler/Observatør']} ({row['Antall Observasjoner']})\n"
+                 # Format: "1. Count Observer Name". Add newline.
+                observers_list_md += f"{index + 1}. {row['Antall Observasjoner']} {row['Innsamler/Observatør']}\n"
+            st.markdown("**Topp 10 Innsamlere (Hyppighet):**") # Updated title
             st.markdown(observers_list_md) # Display the markdown list.
 
 
@@ -145,6 +187,10 @@ def display_dashboard(data):
         with rl_cols[i]: # Select the appropriate column
             # Display metric for the specific category count.
             st.metric(label=f"Antall {category}", value=f"{redlist_counts_individual[category]:,}")
+    # Conditionally display Top 10 Redlisted Observations by Individual Count
+    if st.session_state.show_dashboard_top_lists:
+        st.markdown("**Topp 10 Rødlistede Observasjoner (Individer):**") # Add title
+        st.markdown(format_top_observations_md(top_redlist_obs))
 
     # --- Individual Alien Species Category Counts ---
     st.markdown(f"#### Antall Funn per Fremmedartkategori (Totalt: {alien_count:,})") # Title with total alien count
@@ -157,7 +203,10 @@ def display_dashboard(data):
             count = alien_counts_individual.get(category, 0) # Get count, default to 0 if somehow missing
             label = f"Antall {category}" # Create label
             st.metric(label=label, value=f"{count:,}") # Display metric
-
+    # Conditionally display Top 10 Alien Observations by Individual Count
+    if st.session_state.show_dashboard_top_lists:
+        st.markdown("**Topp 10 Fremmedart Observasjoner (Individer):**") # Add title
+        st.markdown(format_top_observations_md(top_alien_obs))
 
     # --- Special Status Counts ---
     # st.divider()  # Removed divider
@@ -174,6 +223,10 @@ def display_dashboard(data):
     with spec_col4:
         st.metric(label="Spes. Økol. Former", value=f"{spes_okol_former_count:,}")  # Display count for Spes. Økol. Former.
     # spec_col5 remains empty
+    # Conditionally display Top 10 Special Status Observations by Individual Count
+    if st.session_state.show_dashboard_top_lists:
+        st.markdown("**Topp 10 Spes. Status Observasjoner (Individer):**") # Add title
+        st.markdown(format_top_observations_md(top_special_obs))
 
     # --- Observation Period ---
     # st.divider()  # Removed divider
