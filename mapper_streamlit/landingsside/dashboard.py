@@ -92,15 +92,40 @@ def display_dashboard(data):
         formatters=formatting_funcs
     )
 
-    # --- Display Observation Period Figure (New) ---
-    # Check if yearly_metrics_data is not empty before creating/displaying the figure
+    # --- Display Observation Period Figure (New Interactive Version) ---
+    st.markdown("--- ") # Add a separator before the figure section.
+    st.markdown("##### Observasjoner over tid") # Add a subheader for the figure.
+
+    # Check if data for the figure exists
     if not yearly_metrics_data.empty:
-        # Create the figure using the calculated yearly data.
-        observation_period_fig = create_observation_period_figure(yearly_metrics_data)
-        # Display the Plotly figure using Streamlit.
-        st.plotly_chart(observation_period_fig, use_container_width=True) # Display the chart, making it fit the container width.
+        # Define the available traces for selection
+        available_traces = [
+            'Antall Observasjoner',
+            'Antall Individer',
+            'Gj.snitt Individer/Observasjon'
+        ]
+        # Create the multiselect widget
+        selected_traces = st.multiselect(
+            label="Velg metrikker å vise i figuren:", # Widget label.
+            options=available_traces, # Options are the trace names.
+            default=available_traces[0:2] # Default to showing the first two (Obs & Individer).
+        )
+
+        # Only create and display the figure if at least one trace is selected
+        if selected_traces:
+            # Create the figure using the calculated yearly data and selected traces.
+            observation_period_fig = create_observation_period_figure(
+                yearly_data=yearly_metrics_data,
+                traces_to_show=selected_traces # Pass the user's selection.
+                )
+            # Display the Plotly figure using Streamlit.
+            st.plotly_chart(observation_period_fig, use_container_width=True) # Display the chart, making it fit the container width.
+        else:
+            # Message if the user deselects all options.
+            st.info("Velg minst én metrikk for å vise figuren.") # Prompt user to select traces.
+
     else:
-        # Optional: Display a message if no data is available for the chart
+        # Optional: Display a message if no data is available for the chart initially
         st.info("Ingen data tilgjengelig for observasjonsperiodefiguren etter filtrering eller databehandling.") # Inform user about missing chart data.
 
     # --- Removed Observation Period Text Display ---
