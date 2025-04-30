@@ -20,7 +20,7 @@ st.write(
 # Define path relative to the current script file
 # Broke path definition for readability
 taxonomy_file = (
-    Path(__file__).parent / "databehandling/output/fuglsortland_taxonomy.csv"
+    Path(__file__).parent / "databehandling/output/Andøya_fugl_taxonomy.csv"
 )
 # Check if the direct file exists
 use_direct_file = taxonomy_file.exists()  # Check if local taxonomy file exists

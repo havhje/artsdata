@@ -24,6 +24,7 @@ dependencies = [
     "numpy>=1.21.0",
     "requests>=2.32.3",
     "tqdm>=4.67.1",
+    "watchdog>=4.0.2",
 ]
 
 # Use find with explicit where clause
