@@ -26,10 +26,12 @@ def format_top_observations_md(df):
 # Shows item name, frequency count, and sum of individuals.
 # Takes df, title (unused), item_col, count_col, sum_col.
 def format_top_agg_md(df, title, item_col, count_col, sum_col):
-    md_string = "**Observasjon | Sum. individ**\n" # Set fixed header
+    # md_string = "**Observasjon | Sum. individ**\n" # REMOVED: Header is now displayed separately.
+    md_string = "" # Start with empty string.
     if df.empty:
         # Append message if DataFrame is empty, using item_col to generalize.
-        return md_string + f"_Ingen {item_col.lower()}er å vise._" # Return specific empty message.
+        # No header added here anymore.
+        return f"_Ingen {item_col.lower()}er å vise._" # Return specific empty message.
     # Correctly unpack iterrows() while using enumerate for numbering
     for i, (_, row_series) in enumerate(df.iterrows()): # Iterate through aggregated DataFrame rows.
         # Format: "1. ItemName Freq | SumInd". Add newline.
@@ -46,7 +48,7 @@ def format_top_frequency_md(data, title, item_col=None, count_col=None):
     md_string = "" # Start with empty string (title often handled externally).
     if isinstance(data, pd.Series): # Check if input is a Series
         if data.empty:
-             return md_string + "_Ingen data å vise._" # Generic empty message for series.
+            return md_string + "_Ingen data å vise._" # Generic empty message for series.
         for i, (item, count) in enumerate(data.items()): # Iterate through series items.
             # Format: "1. Count Item". Add newline. Replace comma with space.
             formatted_count = f'{count:,}'.replace(',', ' ') # Format count.

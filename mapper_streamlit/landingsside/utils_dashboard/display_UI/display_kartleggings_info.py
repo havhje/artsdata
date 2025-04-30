@@ -52,7 +52,7 @@ def display_main_metrics_grid(metrics, top_lists, show_top_lists, formatters):
 # Takes the metrics dictionary containing min_date and max_date.
 def display_date_range(metrics):
     st.markdown("---") # Add a separator line before the date range.
-    st.markdown("#### Observasjonsperiode")  # Section title using markdown.
+    st.markdown("##### Observasjonsperiode")  # Section title using markdown.
     # Use columns for alignment, dates in first 2 columns.
     date_col1, date_col2, _, _, _ = st.columns(5)
 

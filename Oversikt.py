@@ -57,7 +57,7 @@ data_for_dashboard = data_for_visning.copy()
 data_for_dashboard.columns = [get_display_name(col) for col in data_for_dashboard.columns]
 
 # --- Dashboard --- Display KPIs based on the FILTERED and RENAMED data
-st.subheader("KPI Oversikt")  # Add a subheader for the dashboard
+st.subheader("Nøkkeltall")  # Add a subheader for the dashboard
 display_dashboard(data_for_dashboard)  # Call the dashboard function with the RENAMED data
 
 # --- Define Alien Species Criteria ---

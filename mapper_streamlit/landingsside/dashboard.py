@@ -53,7 +53,7 @@ def display_dashboard(data):
     # Header and main toggle button side-by-side
     header_cols = st.columns([0.8, 0.2]) # Allocate space: 80% for header, 20% for button.
     with header_cols[0]:
-        st.subheader("Dashboard Oversikt")  # Add a subheader for the dashboard section.
+        st.markdown("##### Kartleggingsstatestikk")
     with header_cols[1]:
         # Button to toggle visibility of all Top 10 lists in this dashboard section.
         if st.button("Topp 10", key="toggle_all_dashboard_lists"): # Use a specific key for this button.
