@@ -77,25 +77,25 @@ def display_dashboard(data):
         st.metric(label="Totalt Antall Observasjoner", value=f"{total_records:,}")  # Display total records with formatting.
         st.metric(label="Totalt Antall Individer", value=f"{total_individuals:,}")  # Display total individuals sum with formatting.
         # Display TOTAL redlisted count. Category list defined above.
-        st.metric(label="Totalt Antall Rødlistede Funn (CR-DD)", value=f"{redlisted_total_count:,}") # Updated label slightly
 
     with col2:  # Content for the second column.
         st.metric(label="Unike Arter", value=f"{unique_species:,}")  # Display unique species count.
+        st.metric(label="Unike Familier", value=f"{unique_families:,}")  # Display unique family count.
         # --- Expander Removed ---
         # with st.expander(f"Topp {top_n} Arter"):  # Creates an expandable section below the metric.
         #     # Display top species table within expander.
         #     st.dataframe(top_species, use_container_width=True, hide_index=True)
 
         # Display alien species count. Logic defined above.
-        st.metric(label="Antall Fremmedart Funn (Risiko/Kat=Yes)", value=f"{alien_count:,}")
 
     with col3:  # Content for the third column.
-        st.metric(label="Unike Familier", value=f"{unique_families:,}")  # Display unique family count.
+        st.metric(label="Totalt Antall Rødlistede Funn (CR-DD)", value=f"{redlisted_total_count:,}") # Updated label slightly
+        st.metric(label="Antall Fremmedart Funn (Risiko/Kat=Yes)", value=f"{alien_count:,}")
         # --- Expander Removed ---
         # with st.expander(f"Topp {top_n} Familier"):  # Expandable section for top families.
         #     st.dataframe(top_families, use_container_width=True, hide_index=True)  # Display top families table.
 
-        st.metric(label="Unike Innsamlere/Observatører", value=f"{unique_observers:,}")  # Display unique observer count.
+        #st.metric(label="Unike Innsamlere/Observatører", value=f"{unique_observers:,}")  # Display unique observer count.
         # --- Expander Removed ---
         # with st.expander(f"Topp {top_n} Innsamlere/Observatører"):  # Expandable section for top observers.
         #     # Display top observers table.
