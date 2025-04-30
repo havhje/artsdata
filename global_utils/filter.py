@@ -1,9 +1,8 @@
 ## Imports ##
 import streamlit as st
-import pandas as pd
+
 
 ## Functions ##
-
 
 # --- Function: display_filter_widgets ---
 # Creates Streamlit widgets for filtering the data.
@@ -17,48 +16,41 @@ def display_filter_widgets(data):
     """
     st.sidebar.header("Filtreringsvalg")  # Add a header to the sidebar section
 
-    # --- Example: Filter by 'Taksonomisk Gruppe' ---
-    # Check if data is not empty and column exists before creating widget
-    if not data.empty and "Taksonomisk Gruppe" in data.columns:
-        # Get unique, non-null values for the filter options
-        unique_groups = data["Taksonomisk Gruppe"].dropna().unique()
-        # Create multiselect widget. Default to all selected if state not set.
-        # Key is used to store/retrieve value from session_state
-        # The return value is assigned but not used here; we rely on session state.
+    # --- Filter by 'Familie' (using original column name) ---
+    original_col_name = "FamilieNavn"  # Define the original column name for Familie
+    filter_key = 'filter_familie'  # Define the session state key for Familie filter
+    display_label = "Velg Familie(r)"  # Define the display label for the user
+
+    # Check if data is not empty and the original column exists before creating widget
+    if not data.empty and original_col_name in data.columns:
+        # Get unique, non-null values for the filter options from the original column
+        unique_values = data[original_col_name].dropna().unique()
+        # Create multiselect widget. Default to an empty list (no selection).
         st.sidebar.multiselect(
-            "Velg Taksonomisk Gruppe(r)",
-            options=unique_groups,
-            default=list(unique_groups),
-            key='filter_taksonomisk_gruppe'  # Store selection in session state
+            display_label,
+            options=unique_values,
+            default=[],  # Set default to empty list - nothing selected initially
+            key=filter_key  # Use the specific key for Familie filter
         )
     else:
         # Placeholder if no data/column
-        st.sidebar.text("Ingen data for Taksonomisk Gruppe.")
+        st.sidebar.text(f"Ingen data for {original_col_name}.")  # Update message
 
     # --- Add more filter widgets here ---
-    # Example: Filter by 'Orden'
-    # if not data.empty and "Orden" in data.columns:
-    #     unique_ordener = data["Orden"].dropna().unique()
+    # Example: Filter by 'Orden' (Commented out)
+    # original_col_name_orden = "OrdenNavn"
+    # filter_key_orden = 'filter_orden'
+    # display_label_orden = "Velg Orden(er)"
+    # if not data.empty and original_col_name_orden in data.columns:
+    #     unique_ordener = data[original_col_name_orden].dropna().unique()
     #     st.sidebar.multiselect(
-    #         "Velg Orden(er)",
+    #         display_label_orden,
     #         options=unique_ordener,
-    #         default=list(unique_ordener),
-    #         key='filter_orden'
+    #         default=[],
+    #         key=filter_key_orden
     #     )
-
-    # Example: Date range slider (requires a date column)
-    # if not data.empty and 'Dato' in data.columns:
-    #     # Ensure 'Dato' is datetime type (add error handling)
-    #     # data['Dato'] = pd.to_datetime(data['Dato'])
-    #     min_date = data['Dato'].min()
-    #     max_date = data['Dato'].max()
-    #     st.sidebar.date_input(
-    #         "Velg Datoområde",
-    #         value=(min_date, max_date),
-    #         min_value=min_date,
-    #         max_value=max_date,
-    #         key='filter_date_range'
-    #      )
+    # else:
+    #     st.sidebar.text(f"Ingen data for {original_col_name_orden}.")
 
     st.sidebar.info("Flere filtre kommer...")  # Placeholder message
 
@@ -77,35 +69,29 @@ def apply_filters(data):
 
     filtered_data = data.copy()  # Start with a copy of the original data
 
-    # --- Apply 'Taksonomisk Gruppe' Filter ---
+    # --- Apply 'Familie' Filter (using original column name) ---
+    original_col_name = "FamilieNavn"  # Define the original column name for Familie
+    filter_key = 'filter_familie'  # Define the session state key for Familie filter
+
     # Check if the filter key exists in session state
-    if 'filter_taksonomisk_gruppe' in st.session_state:
-        selected_groups = st.session_state['filter_taksonomisk_gruppe']
-        # Apply the filter if the column exists in the DataFrame
-        if "Taksonomisk Gruppe" in filtered_data.columns:
-            # Filter the DataFrame based on the selected groups
-            filtered_data = filtered_data[
-                filtered_data["Taksonomisk Gruppe"].isin(selected_groups)
-            ]
+    if filter_key in st.session_state:
+        selected_values = st.session_state[filter_key]  # Retrieve selected families
+
+        # --- Apply filter ONLY if selections were made --- # Check if the list of selected values is not empty
+        if selected_values:  # Only proceed if the user selected at least one family
+            # Apply the filter if the original column exists in the DataFrame
+            if original_col_name in filtered_data.columns:
+                # Filter the DataFrame based on the selected families using the original column name.
+                filtered_data = filtered_data[filtered_data[original_col_name].isin(selected_values)]
 
     # --- Apply other filters here ---
-    # Example: Apply 'Orden' filter
-    # if 'filter_orden' in st.session_state:
-    #     selected_ordener = st.session_state['filter_orden']
-    #     if "Orden" in filtered_data.columns:
-    #         filtered_data = filtered_data[filtered_data["Orden"].isin(selected_ordener)]
-
-    # Example: Apply Date range filter
-    # if 'filter_date_range' in st.session_state:
-    #     start_date, end_date = st.session_state['filter_date_range']
-    #     if 'Dato' in filtered_data.columns:
-    #         # Ensure 'Dato' is datetime for comparison
-    #         # filtered_data['Dato'] = pd.to_datetime(filtered_data['Dato'])
-    #         # Compare dates properly
-    #         start_date_dt = pd.to_datetime(start_date)
-    #         end_date_dt = pd.to_datetime(end_date)
-    #         filtered_data = filtered_data[
-    #             (filtered_data['Dato'] >= start_date_dt) & (filtered_data['Dato'] <= end_date_dt)
-    #         ]
+    # Example: Apply 'Orden' filter (Commented out)
+    # original_col_name_orden = "OrdenNavn"
+    # filter_key_orden = 'filter_orden'
+    # if filter_key_orden in st.session_state:
+    #     selected_ordener = st.session_state[filter_key_orden]
+    #     if selected_ordener:
+    #         if original_col_name_orden in filtered_data.columns:
+    #             filtered_data = filtered_data[filtered_data[original_col_name_orden].isin(selected_ordener)]
 
     return filtered_data  # Return the filtered DataFrame
