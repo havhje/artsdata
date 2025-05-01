@@ -44,6 +44,10 @@ else:
         # Warning if local file missing and no upload yet
         st.warning("Lokal fil ikke funnet. Last opp en fil.")  # Show warning
 
+# --- Store loaded data in session state ---
+if not innlastet_data.empty:
+    st.session_state['loaded_data'] = innlastet_data # Store the DataFrame
+
 # --- Filter Widgets --- Display filter options in the sidebar
 display_filter_widgets(innlastet_data)
 
