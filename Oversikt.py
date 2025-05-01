@@ -4,7 +4,12 @@ from pathlib import Path
 from global_utils.column_mapping import get_display_name
 from mapper_streamlit.landingsside.dashboard import display_dashboard  # Import the dashboard function
 from global_utils.filter import display_filter_widgets, apply_filters  # Import filter functions
+from global_utils.session_state_manager import initialize_and_persist_filters # Import the persistence function
 
+##### Initialize/Persist Session State #####
+initialize_and_persist_filters() # Ensure filter state persists across pages
+
+##### Page Configuration #####
 # Set page layout to wide
 st.set_page_config(layout="wide")
 

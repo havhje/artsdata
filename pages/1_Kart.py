@@ -2,6 +2,10 @@
 import streamlit as st # Import the Streamlit library
 from global_utils.filter import display_filter_widgets, apply_filters
 import pandas as pd # Import pandas for creating empty DataFrame
+from global_utils.session_state_manager import initialize_and_persist_filters # Import the persistence function
+
+##### Initialize/Persist Session State #####
+initialize_and_persist_filters() # Ensure filter state persists across pages
 
 # --- Attempt to retrieve data from session state ---
 kart_data = pd.DataFrame() # Initialize as empty DataFrame
