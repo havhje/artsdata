@@ -41,7 +41,12 @@ def calculate_yearly_metrics(data, date_col_name: str, individuals_col_name: str
         # --- Data Preparation ---
         df = data.copy()  # Create a copy.
         # Convert date column, coercing errors.
-        df[date_col_name] = pd.to_datetime(df[date_col_name], errors='coerce')
+        # Explicitly specify the expected date format to avoid warnings and ensure correct parsing.
+        df[date_col_name] = pd.to_datetime(
+            df[date_col_name], 
+            errors='coerce', 
+            format='%d.%m.%Y %H:%M:%S' # Specify expected day-first format with time
+        )
         df.dropna(subset=[date_col_name], inplace=True)  # Drop rows where date conversion failed.
 
         # Handle empty DataFrame after date conversion/dropna

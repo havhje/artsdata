@@ -23,7 +23,6 @@ def display_filter_widgets(data):
         st.multiselect(
             display_label_familie,
             options=unique_values_familie,
-            default=[],  # Set default to empty list - nothing selected initially
             key=filter_key_familie  # Use the specific key for Familie filter
             )
 
@@ -36,7 +35,6 @@ def display_filter_widgets(data):
         st.multiselect(
             display_label_orden,
             options=unique_values_orden,
-            default=[], # Set default to empty list
             key=filter_key_orden # Use the specific key for Orden filter
             )
 
@@ -49,7 +47,6 @@ def display_filter_widgets(data):
         st.multiselect( # Use st.multiselect directly inside the sidebar expander
             display_label_art,
             options=unique_values_art,
-            default=[], # Set default to empty list
             key=filter_key_art # Use the specific key for Art filter
             )
 

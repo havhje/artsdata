@@ -18,7 +18,12 @@ def calculate_basic_metrics(data):
 
     # Date Range
     # Convert to datetime, coercing errors to NaT (Not a Time).
-    valid_dates = pd.to_datetime(data["Innsamlingsdato/-tid"], errors='coerce').dropna()
+    # Explicitly specify the expected date format to avoid warnings and ensure correct parsing.
+    valid_dates = pd.to_datetime(
+        data["Innsamlingsdato/-tid"], 
+        errors='coerce', 
+        format='%d.%m.%Y %H:%M:%S' # Specify expected day-first format with time
+    ).dropna()
     min_date = valid_dates.min() if not valid_dates.empty else None  # Get earliest date if available.
     max_date = valid_dates.max() if not valid_dates.empty else None  # Get latest date if available.
 

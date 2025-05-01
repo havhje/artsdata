@@ -11,3 +11,6 @@ wheels/
 
 # Streamlit secrets
 .streamlit/secrets.toml
+
+# Environment variables file
+.env
