@@ -36,6 +36,12 @@ This Streamlit application provides an interactive interface for exploring and a
     *   The `global_utils/session_state_manager.py` module ensures that filter values selected by the user are preserved in `st.session_state` even when navigating between different application pages.
     *   It achieves this by initializing necessary keys if they don't exist and preventing Streamlit's default widget state clean-up for these specific keys.
 
+7.  **PDF Vector Search** (`pages/8_KI_vektor_database.py`):
+    *   Allows users to perform semantic searches against the content of pre-processed PDF documents stored in a Weaviate vector database.
+    *   Connects to a Weaviate Cloud instance using credentials stored in `.streamlit/secrets.toml`.
+    *   Uses the Cohere embedding model (via Weaviate integration) to vectorize user queries and find relevant text chunks.
+    *   Displays the most relevant text chunks along with their source PDF and page number.
+
 ## Structure
 
 *   `Oversikt.py`: The main application script, orchestrating loading, filtering, dashboard display, and table views.
@@ -43,21 +49,46 @@ This Streamlit application provides an interactive interface for exploring and a
     *   `column_mapping.py`: Defines the mapping from technical to display names.
     *   `filter.py`: Implements the sidebar filter widgets and the logic to apply filters.
     *   `session_state_manager.py`: Handles the initialization and persistence logic for filter values in session state.
+    *   `KI_vektor_skript.py`: Standalone script (run manually) responsible for processing PDFs, chunking text, connecting to Weaviate, and ingesting the vectorized data into the `PdfChunks` collection.
 *   `mapper_streamlit/landingsside/`: Contains modules specific to the main dashboard view:
     *   `dashboard.py`: Orchestrates the calculation and display of dashboard components.
     *   `utils_dashboard/`: Sub-modules for calculations (basic metrics, status counts, top lists) and UI display logic.
     *   `figures_dashboard/`: Sub-modules for generating the observation period Plotly figure.
-*   `pages/`: Likely contains other Streamlit pages (e.g., `2_Søylediagrammer.py`), suggesting a multi-page application structure where data loaded in `Oversikt.py` might be used.
-*   `databehandling/output/`: Expected location for processed input data.
+*   `pages/`: Contains other Streamlit pages for different views:
+    *   `2_Søylediagrammer.py`: Example page (content TBD).
+    *   `8_KI_vektor_database.py`: Page providing the user interface for PDF vector search.
+*   `databehandling/output/`: Expected location for processed input data (e.g., taxonomy CSV).
+*   `vektor_database/`: Directory containing the source PDF files for vector database ingestion.
 *   `project.doc.md`: This file, providing an overview of the project.
+*   `.env`: Local file (ignored by Git) storing API keys for the standalone ingestion script.
+*   `.streamlit/secrets.toml`: Streamlit file storing secrets (API keys, tokens) for the running application.
+*   `.streamlit/config.toml`: Streamlit file for non-secret configurations.
 
 ## How to Run
 
-Assuming dependencies (`streamlit`, `pandas`, `plotly`, `pathlib`) are installed (preferably using `uv sync`):
+1.  **Run Streamlit App:**
+    ```bash
+    # From the workspace root (artsdata directory)
+    uv run streamlit run Oversikt.py
+    ```
+2.  **Run PDF Ingestion (One-time or when PDFs change):**
+    *   Ensure the `.env` file is populated with correct API keys (Weaviate URL/Key, Cohere Key).
+    *   Delete the `PdfChunks` collection in your Weaviate Cloud instance if you need a completely clean import.
+    ```bash
+    # From the workspace root (artsdata directory)
+    uv run python global_utils/KI_vektor_skript.py
+    ```
 
-```bash
-# From the workspace root (artsdata directory)
-uv run streamlit run Oversikt.py
-```
+## Development Notes & Challenges
 
-This will start the Streamlit server and open the application in a web browser.
+*   **PDF Ingestion Script (`KI_vektor_skript.py`):**
+    *   **Secrets Handling:** Initial attempts to use `st.secrets` within the standalone ingestion script failed because `st.secrets` is only populated when running via `streamlit run`. Switched to using `python-dotenv` and a `.env` file for managing secrets in the standalone script context.
+    *   **Weaviate Client v4 API:** Encountered several `AttributeError` issues due to API changes between Weaviate client v3 and v4, particularly around schema definition (`wvc.config.Property` vs `wvc.Property`) and batch configuration.
+    *   **Batching & Rate Limits:** The initial PDF ingestion attempts using Weaviate's dynamic batching (`collection.batch.dynamic()`) failed due to hitting Cohere's free tier API rate limits (specifically `trial token rate limit exceeded`).
+    *   **Troubleshooting Batching:** Attempts to fix rate limiting by explicitly configuring smaller batch sizes (`client.batch.configure`, configuring via `ConnectionParams`, configuring via `collection.batch.add`) failed due to `AttributeError`s, indicating difficulties finding the correct v4 syntax for modifying batch behavior post-connection or during connection with `connect_to_wcs`.
+    *   **Current Approach:** Reverted to dynamic batching (`collection.batch.dynamic()`) assuming the user has upgraded Cohere capacity. Further refinement might involve implementing manual batching with delays (`time.sleep`) or switching embedding providers if rate limits persist.
+*   **Streamlit Weaviate Connection (`pages/8_KI_vektor_database.py`):**
+    *   The `streamlit-weaviate` connection helper mentioned in some Streamlit blogs was not found as a standard installable package via `uv add`.
+    *   Initial attempts to use `st.connection(..., type=WeaviateConnection)` failed with `ModuleNotFoundError`.
+    *   Subsequent attempts to use generic `st.connection(...)` failed with `KeyError: 'connections'` because it expected a specific configuration structure in `secrets.toml`.
+    *   **Current Approach:** The Streamlit page now connects to Weaviate *manually* using `weaviate.connect_to_wcs(...)` within the page script, bypassing `st.connection` for this specific integration.
