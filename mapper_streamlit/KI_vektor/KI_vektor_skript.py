@@ -8,9 +8,8 @@ from pathlib import Path # Import Path for easier path manipulation
 from dotenv import load_dotenv # Import function to load .env file
 
 ##### Constants #####
-# Define the path to the directory containing PDF files, relative to the script location or project root
-# Assuming this script is run from the project root ('artsdata')
-PDF_DIRECTORY = Path("vektor_database")
+# Define the path to the directory containing PDF files, relative to the project root
+PDF_DIRECTORY = Path("mapper_streamlit/KI_vektor/vektor_database")
 # Define the name for the Weaviate collection (class)
 COLLECTION_NAME = "PdfChunks"
 # Define the properties for the objects in the collection

@@ -1,0 +1,168 @@
+# Weaviate Vector Database Documentation (`KI_vektor`)
+
+## Purpose
+
+This directory contains scripts for interacting with a Weaviate vector database. It includes:
+
+1.  **Ingestion Script (`KI_vektor_skript.py`):** Reads PDF documents from a specified directory, splits them into text chunks (paragraphs), and imports these chunks into a Weaviate collection. Each chunk is vectorized using a configured model (Cohere) to enable semantic search.
+2.  **Streamlit Query Page (`pages/8_KI_vektor_database.py`):** Provides a user interface within the main Streamlit application to perform semantic searches (vector searches) against the indexed PDF content in the Weaviate database.
+
+## Project Structure
+
+```
+mapper_streamlit/
+└── KI_vektor/
+    ├── KI_vektor_skript.py             # Main script for PDF ingestion into Weaviate
+    ├── vektor_database/                # Directory containing source PDF files
+    │   └── *.pdf                       # Example PDF files
+    └── KI_vektor_project_description.md # This documentation file
+
+pages/
+└── 8_KI_vektor_database.py         # Streamlit page for querying the database
+```
+
+*Note: The `pages/` directory is separate but functionally linked.* 
+*The `.env` file (for ingestion script secrets) and `.streamlit/secrets.toml` (for Streamlit page secrets) are typically located in the project root.* 
+
+## Workflow
+
+### 1. Ingestion (`KI_vektor_skript.py`)
+
+This script is run manually from the command line to populate or update the Weaviate database.
+
+1.  **Load Environment Variables:** Reads `WEAVIATE_URL`, `WEAVIATE_API_KEY`, and `COHERE_API_KEY` from a `.env` file using `dotenv`.
+2.  **Connect to Weaviate:** Establishes a connection to the Weaviate instance using the loaded credentials (`connect_to_weaviate`).
+3.  **Setup Collection:** Checks if the target collection (`COLLECTION_NAME`, e.g., "PdfChunks") exists. If it does, it **deletes the existing collection** to ensure a clean import, then creates it with the defined schema (`PROPERTIES`, `VECTORIZER_CONFIG`, `GENERATIVE_CONFIG`) using `setup_collection`.
+4.  **Find PDFs:** Locates all `.pdf` files within the `PDF_DIRECTORY`.
+5.  **Process PDFs:** For each PDF file:
+    *   Calls `process_pdf` which opens the PDF using `pypdf`.
+    *   Extracts text page by page.
+    *   Splits the text of each page into paragraphs (based on `\n\n`).
+    *   Yields each non-empty paragraph as a dictionary object containing `text_chunk`, `source_pdf` (filename), and `page_number`.
+6.  **Batch Import:** Uses Weaviate's dynamic batching (`collection.batch.dynamic()`) to efficiently import the yielded paragraph objects into the collection. Weaviate automatically handles vectorization using the configured Cohere model.
+7.  **Close Connection:** Closes the Weaviate client connection.
+
+### 2. Querying (`pages/8_KI_vektor_database.py`)
+
+This script runs as part of the Streamlit application.
+
+1.  **Page Config:** Sets the page title and layout.
+2.  **Connect to Weaviate:** Establishes a connection using secrets stored in Streamlit's secrets management (`st.secrets["WEAVIATE_URL"]`, etc., typically configured in `.streamlit/secrets.toml`). Handles connection errors.
+3.  **Display UI:** If the connection is successful, displays a text input field (`st.text_input`) for the user's query and a search button (`st.button`).
+4.  **Perform Search:** If the search button is clicked and a query is entered:
+    *   Gets the Weaviate collection object.
+    *   Performs a `nearText` vector search using `collection.query.near_text()`.
+        *   Uses the `user_query` as the search vector.
+        *   Limits results using `SEARCH_LIMIT`.
+        *   Specifies properties to return using `QUERY_PROPERTIES`.
+5.  **Display Results:** If results (`response.objects`) are returned:
+    *   Iterates through the result objects.
+    *   Displays the `text_chunk`, `source_pdf`, and `page_number` for each hit.
+    *   Handles the case where no results are found.
+
+## Setup
+
+### Dependencies
+
+These modules rely on:
+
+*   `weaviate-client`: The official Python client for Weaviate.
+*   `pypdf`: For reading and extracting text from PDF files.
+*   `python-dotenv`: For loading environment variables from a `.env` file (used by the ingestion script).
+*   `streamlit`: For the query page UI.
+
+### Installation (using uv)
+
+From the workspace root (`artsdata` directory), ensure `uv` is installed and run:
+
+```bash
+# Add dependencies if not already present
+uv add weaviate-client pypdf python-dotenv streamlit
+
+# Install all project dependencies
+uv sync
+```
+
+Alternatively, using `pip` and `venv`:
+
+```bash
+# Ensure virtual environment is active
+pip install weaviate-client pypdf python-dotenv streamlit
+```
+
+### Environment & Secrets Configuration
+
+Credentials are required to connect to Weaviate and the Cohere API.
+
+1.  **For Ingestion (`KI_vektor_skript.py`):**
+    *   Create a file named `.env` in the **project root** (`artsdata`).
+    *   Add the following lines, replacing placeholders with your actual credentials:
+        ```
+        WEAVIATE_URL=your_weaviate_cluster_url
+        WEAVIATE_API_KEY=your_weaviate_api_key
+        COHERE_API_KEY=your_cohere_api_key
+        ```
+
+2.  **For Querying Page (`8_KI_vektor_database.py`):**
+    *   Create a file named `secrets.toml` inside a `.streamlit` directory in the **project root** (`artsdata/.streamlit/secrets.toml`).
+    *   Add the following lines, replacing placeholders:
+        ```toml
+        WEAVIATE_URL = "your_weaviate_cluster_url"
+        WEAVIATE_API_KEY = "your_weaviate_api_key"
+        COHERE_API_KEY = "your_cohere_api_key"
+        ```
+
+*Ensure these files are added to your `.gitignore` file to avoid committing secrets.* 
+
+## Usage
+
+### 1. Ingesting PDFs
+
+1.  Place the PDF files you want to index into the `mapper_streamlit/KI_vektor/vektor_database/` directory.
+2.  Ensure your `.env` file is correctly configured with API keys and the Weaviate URL.
+3.  Make sure dependencies are installed.
+4.  Navigate to the workspace root directory (`artsdata`) in your terminal.
+5.  Run the ingestion script:
+
+    ```bash
+    # Using uv (recommended)
+    uv run python mapper_streamlit/KI_vektor/KI_vektor_skript.py
+
+    # Or if using a standard venv
+    # source .venv/bin/activate (or equivalent)
+    # python mapper_streamlit/KI_vektor/KI_vektor_skript.py
+    ```
+    The script will print progress messages and indicate when ingestion is complete. *Note: This script currently deletes and recreates the collection on each run.* 
+
+### 2. Querying the Database
+
+1.  Ensure the Streamlit application is running (e.g., `uv run streamlit run Oversikt.py` from the project root).
+2.  Ensure your `.streamlit/secrets.toml` file is configured.
+3.  Navigate to the "KI Vektor Database" page (Page 8) in the Streamlit sidebar.
+4.  Enter your search query in the text box.
+5.  Click the "Søk i PDFer" button.
+6.  Relevant text chunks from the indexed PDFs will be displayed.
+
+## Configuration Notes
+
+*   **`PDF_DIRECTORY` (`KI_vektor_skript.py`):** Path where the ingestion script looks for PDFs. Currently set to `mapper_streamlit/KI_vektor/vektor_database`.
+*   **`COLLECTION_NAME` (Both scripts):** Name of the Weaviate collection. Must be consistent. Currently "PdfChunks".
+*   **`PROPERTIES` (`KI_vektor_skript.py`):** Defines the schema (data fields) for objects stored in Weaviate. Currently `text_chunk`, `source_pdf`, `page_number`.
+*   **`VECTORIZER_CONFIG` (`KI_vektor_skript.py`):** Specifies the vectorizer (e.g., `text2vec-cohere`).
+*   **`GENERATIVE_CONFIG` (`KI_vektor_skript.py`):** Specifies the generative module (e.g., Cohere) for potential future RAG features.
+*   **Environment Variables/Secrets:** API keys and URLs are crucial and managed via `.env` and `secrets.toml`.
+*   **`SEARCH_LIMIT` (`8_KI_vektor_database.py`):** Controls how many results are retrieved by the query page.
+*   **`QUERY_PROPERTIES` (`8_KI_vektor_database.py`):** Specifies which data fields to retrieve and display for search results.
+*   **Chunking Strategy (`KI_vektor_skript.py`):** Currently splits PDFs by page, then by double newline (`\n\n`). This might not be optimal for all documents; other strategies (fixed size chunks, sentence splitting) could be explored.
+
+## Current State & Future Improvements
+
+*   **Functional Core:** Provides basic PDF ingestion and semantic search capabilities.
+*   **Minimal Implementation:** Scripts follow minimal functional logic, lacking comprehensive error handling beyond basic connection checks, logging, type hints, and detailed docstrings.
+*   **Collection Deletion:** The ingestion script currently **deletes and replaces** the entire collection on every run. For incremental updates, more sophisticated logic would be needed (e.g., checking for existing documents/chunks).
+*   **Chunking Strategy:** The current paragraph-based chunking is simple but may split related content or create very large/small chunks. Exploring more advanced chunking methods (e.g., recursive splitting, semantic chunking) could improve search relevance.
+*   **Error Handling:** Robust error handling for file processing, API calls (Weaviate, Cohere), and data validation should be added.
+*   **Logging:** Implementing proper logging would aid debugging and monitoring.
+*   **Testing:** Unit and integration tests are needed to verify PDF processing, Weaviate interaction, and search result formats.
+*   **UI Enhancements (Query Page):** Could add features like displaying metadata alongside results, highlighting search terms, adjusting search parameters (limit, relevance threshold), or integrating generative AI (RAG) to synthesize answers based on retrieved chunks.
+*   **Ingestion Script CLI:** Could make the ingestion script more flexible with command-line arguments for the PDF directory or collection name.
