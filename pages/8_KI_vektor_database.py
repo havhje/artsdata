@@ -1,7 +1,7 @@
 ##### Imports #####
 import streamlit as st # Import Streamlit framework
 import weaviate # Import weaviate client library
-import weaviate.classes as wvc # Import weaviate classes
+# Removed unused import: import weaviate.classes as wvc
 # Removed: from streamlit_weaviate.connection import WeaviateConnection
 
 ##### Constants #####
@@ -25,7 +25,8 @@ try:
     # structure in secrets.toml or a missing helper type (streamlit-weaviate).
     # Connecting directly using the weaviate client library.
     print("Attempting manual Weaviate connection...") # Log attempt
-    client = weaviate.connect_to_wcs(
+    # Use the current recommended connection function
+    client = weaviate.connect_to_weaviate_cloud(
             cluster_url=st.secrets["WEAVIATE_URL"],
             auth_credentials=weaviate.auth.AuthApiKey(st.secrets["WEAVIATE_API_KEY"]),
             headers={"X-Cohere-Api-Key": st.secrets["COHERE_API_KEY"]}
@@ -79,8 +80,8 @@ if client and not conn_error:
             st.error(f"Feil under Weaviate-søk: {e}") # Display error message
             # Optional: Add more specific error handling for Weaviate errors if needed
 
-    # Consider closing the client connection if appropriate for app structure
-    # client.close() # Typically not closed on every Streamlit rerun
+        # Close the client connection to prevent resource warnings
+        client.close() # Ensure the connection is closed after use
 
 else:
     if not conn_error: # Only show this if connection wasn't explicitly flagged as error
