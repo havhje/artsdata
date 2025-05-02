@@ -1,6 +1,7 @@
 ##### Imports #####
 import streamlit as st # Import the Streamlit library
-from global_utils.filter import display_filter_widgets, apply_filters
+from global_utils.filtering.filter_ui import display_filter_widgets # Import the UI widget function
+from global_utils.filtering.filter_logic import apply_filters # Import the filter application function
 import pandas as pd # Import pandas for creating empty DataFrame
 from global_utils.session_state_manager import initialize_and_persist_filters # Import the persistence function
 

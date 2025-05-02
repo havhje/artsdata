@@ -3,7 +3,8 @@ import pandas as pd
 from pathlib import Path
 from global_utils.column_mapping import get_display_name
 from mapper_streamlit.landingsside.dashboard import display_dashboard  # Import the dashboard function
-from global_utils.filter import display_filter_widgets, apply_filters  # Import filter functions
+from global_utils.filtering.filter_ui import display_filter_widgets # Import the UI widget function
+from global_utils.filtering.filter_logic import apply_filters # Import the filter application function
 from global_utils.session_state_manager import initialize_and_persist_filters # Import the persistence function
 
 ##### Initialize/Persist Session State #####
