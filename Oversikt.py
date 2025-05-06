@@ -31,12 +31,12 @@ st.write(
 taxonomy_file_default_path = Path(__file__).parent / "databehandling/output/Andøya_fugl_taxonomy.csv" # Defines the path to a local default CSV file.
 file_input_for_loader = taxonomy_file_default_path # Initially assumes the local default file will be used.
 
-# --- File Uploader in Sidebar ---
-# st.sidebar.subheader("Last opp data") # Subheader for the uploader section. # Moved below with the conditional display
-uploaded_file = st.sidebar.file_uploader(
-    "Velg CSV-fil (Erstatter lokal fil hvis valgt)", # Label for the file uploader widget.
-    type="csv" # Restricts file types to CSV.
-)
+# --- File Uploader --- # Moved from sidebar to main page
+with st.expander("Last opp datafil"):
+    uploaded_file = st.file_uploader(
+        "Velg CSV-fil (Erstatter lokal fil hvis valgt)", # Label for the file uploader widget.
+        type="csv" # Restricts file types to CSV.
+    )
 
 if uploaded_file is not None: # Checks if a file has been uploaded by the user.
     file_input_for_loader = uploaded_file # If uploaded, it overrides the default local file path.
