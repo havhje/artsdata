@@ -9,55 +9,53 @@ from typing import List            # Import List for type hinting.
 def create_observation_period_figure(yearly_data, traces_to_show: List[str]):
     # --- Function: create_observation_period_figure ---
     # Creates a Plotly figure showing selected yearly observation metrics.
-    # Takes a DataFrame and a list of trace names to display.
-    # Expected trace names: 'Antall Observasjoner', 'Antall Individer', 'Gj.snitt Individer/Observasjon'
+    # Takes a DataFrame and a list of ACTUAL column names (from yearly_data) to display.
+    # e.g., traces_to_show might be ['Sum_Observations', 'Sum_Individuals']
 
-    # --- Initialize Figure ---
     fig = go.Figure()  # Create an empty Plotly figure.
 
-    # --- Define Trace Names ---
-    trace_obs = 'Antall Observasjoner'           # Define name for observation count trace.
-    trace_ind = 'Antall Individer'             # Define name for individual count trace.
-    trace_avg = 'Gj.snitt Individer/Observasjon'  # Define name for average trace.
+    # --- Define mappings from actual column names to their desired display names for the legend ---
+    # These display names should match what the user sees in the multiselect in dashboard.py
+    column_to_display_name_map = {
+        'Sum_Observations': 'Antall Observasjoner',
+        'Sum_Individuals': 'Antall Individer',
+        'Avg_Individuals_Per_Observation': 'Gj.snitt Individer/Observasjon'
+    }
 
     # --- Conditionally Add Traces ---
-    # Add trace for Sum of Observations if selected
-    if trace_obs in traces_to_show:
-        fig.add_trace(go.Scatter(
-            x=yearly_data['Year'],                  # Set x-axis to Year.
-            y=yearly_data['Sum_Observations'],      # Set y-axis to Sum_Observations.
-            mode='lines+markers',                 # Use lines and markers for the plot points.
-            name=trace_obs                        # Name of the trace for the legend.
-        ))
-
-    # Add trace for Sum of Individuals if selected
-    if trace_ind in traces_to_show:
-        fig.add_trace(go.Scatter(
-            x=yearly_data['Year'],                  # Set x-axis to Year.
-            y=yearly_data['Sum_Individuals'],       # Set y-axis to Sum_Individuals.
-            mode='lines+markers',                 # Use lines and markers.
-            name=trace_ind                        # Name of the trace.
-        ))
-
-    # Add trace for Average Individuals per Observation if selected
-    if trace_avg in traces_to_show:
-        fig.add_trace(go.Scatter(
-            x=yearly_data['Year'],                            # Set x-axis to Year.
-            y=yearly_data['Avg_Individuals_Per_Observation'],  # Set y-axis to the calculated average.
-            mode='lines+markers',                           # Use lines and markers.
-            name=trace_avg                                  # Name of the trace.
-        ))
+    # Iterate through the actual column names passed in traces_to_show
+    for col_name in traces_to_show:
+        if col_name == 'Sum_Observations':
+            fig.add_trace(go.Scatter(
+                x=yearly_data['Year'],
+                y=yearly_data['Sum_Observations'],
+                mode='lines+markers',
+                name=column_to_display_name_map['Sum_Observations'] # Use display name for legend
+            ))
+        elif col_name == 'Sum_Individuals':
+            fig.add_trace(go.Scatter(
+                x=yearly_data['Year'],
+                y=yearly_data['Sum_Individuals'],
+                mode='lines+markers',
+                name=column_to_display_name_map['Sum_Individuals'] # Use display name for legend
+            ))
+        elif col_name == 'Avg_Individuals_Per_Observation':
+            fig.add_trace(go.Scatter(
+                x=yearly_data['Year'],
+                y=yearly_data['Avg_Individuals_Per_Observation'],
+                mode='lines+markers',
+                name=column_to_display_name_map['Avg_Individuals_Per_Observation'] # Use display name for legend
+            ))
 
     # --- Configure Layout ---
     fig.update_layout(
-        title="Observasjoner og Individer per År",  # Set the main title of the figure.
-        xaxis_title="År",                       # Set the label for the x-axis.
-        yaxis_title="Verdi",                      # Use a generic y-axis title as content varies.
-        legend_title="Metrikk"                    # Set the title for the legend.
+        title="Observasjoner og Individer per År",
+        xaxis_title="År",
+        yaxis_title="Verdi", 
+        legend_title="Metrikk"
     )
 
-    # --- Return Figure ---
-    return fig  # Return the configured Plotly figure object.
+    return fig
 
 # ##### Main Execution Block (Optional) #####
 # if __name__ == '__main__':
@@ -70,8 +68,8 @@ def create_observation_period_figure(yearly_data, traces_to_show: List[str]):
 #         'Sum_Individuals': [500, 700, 600],
 #         'Avg_Individuals_Per_Observation': [5.0, 4.67, 5.0]
 #     })
-#     # Example: Show only Observations and Average
-#     selected = ['Antall Observasjoner', 'Gj.snitt Individer/Observasjon']
-#     fig = create_observation_period_figure(sample_yearly_data, traces_to_show=selected)
+#     # Example: Show Sum_Observations and Avg_Individuals_Per_Observation (actual column names)
+#     selected_actual_cols = ['Sum_Observations', 'Avg_Individuals_Per_Observation']
+#     fig = create_observation_period_figure(sample_yearly_data, traces_to_show=selected_actual_cols)
 #     fig.show()  # Display the figure locally.
 #     pass        # Keep minimal.

@@ -41,20 +41,21 @@ def calculate_yearly_metrics(data, date_col_name: str, individuals_col_name: str
 
         # --- Data Preparation ---
         df = data.copy()  # Create a copy.
-        # Convert date column, coercing errors.
-        # Explicitly specify the expected date format to avoid warnings and ensure correct parsing.
+        # Convert date column to datetime objects.
+        # Removing the strict format string allows pandas to infer the format or handle already-datetime objects.
+        # errors='coerce' will turn unparseable dates into NaT.
         df[date_col_name] = pd.to_datetime(
             df[date_col_name], 
-            errors='coerce', 
-            format='%d.%m.%Y %H:%M:%S' # Specify expected day-first format with time
+            errors='coerce' 
+            # format='%d.%m.%Y %H:%M:%S' # Strict format string removed for flexibility
         )
-        df.dropna(subset=[date_col_name], inplace=True)  # Drop rows where date conversion failed.
+        df.dropna(subset=[date_col_name], inplace=True)  # Drop rows where date conversion resulted in NaT.
 
         # Handle empty DataFrame after date conversion/dropna
         if df.empty:
             # Log warning.
             logger.warning("DataFrame became empty after date conversion/dropping NaTs. "
-                         f"Returning empty yearly metrics.")
+                         "Returning empty yearly metrics.")
             return pd.DataFrame(columns=output_columns)  # Return empty df.
 
         df['Year'] = df[date_col_name].dt.year  # Extract year.
@@ -82,13 +83,13 @@ def calculate_yearly_metrics(data, date_col_name: str, individuals_col_name: str
         # Catch potential KeyErrors during processing (e.g., unforeseen column issues)
         # Log the error and available columns.
         logger.error(f"A KeyError occurred during yearly metric calculation: {e}. "
-                     f"Columns available: {list(data.columns)}. Returning empty yearly metrics.")
+                    f"Columns available: {list(data.columns)}. Returning empty yearly metrics.")
         return pd.DataFrame(columns=output_columns)  # Return empty df.
     except Exception as e:
         # Catch any other unexpected errors during calculation.
         # Log error with traceback info.
         logger.error(f"An unexpected error occurred during yearly metric calculation: {e}. "
-                     f"Returning empty yearly metrics.", exc_info=True)
+                    f"Returning empty yearly metrics.", exc_info=True)
         return pd.DataFrame(columns=output_columns)  # Return empty df.
 
 # ##### Main Execution Block (Optional) #####

@@ -5,44 +5,53 @@ import streamlit as st # Import Streamlit for caching.
 # ##### Constants #####
 REDLIST_CATEGORIES = ['CR', 'EN', 'VU', 'NT', 'DD'] # Define redlist categories. Modifying affects counts.
 ALIEN_CATEGORIES_LIST = ['SE', 'HI', 'PH', 'LO'] # Define specific alien risk categories.
-SPECIAL_STATUS_COLS = ["Prioriterte Arter", "Andre Spes. Hensyn.", "Ansvarsarter", "Spes. Økol. Former"] # Define special status column names.
+# SPECIAL_STATUS_COLS removed, will be passed as a parameter list of original names
 
 # ##### Calculation Functions #####
 
 # --- Function: calculate_all_status_counts ---
 # Calculates counts for Red List, Alien Species, and other special status categories.
-# Takes a pandas DataFrame 'data'.
+# Takes a pandas DataFrame 'data' and relevant original column names.
 # Returns a dictionary containing various status counts.
 @st.cache_data
-def calculate_all_status_counts(data):
+def calculate_all_status_counts(data,
+                                category_col: str,           # Original column name for Red List/Alien Risk category
+                                alien_flag_col: str,         # Original column name for the 'Yes' flag for alien species
+                                original_special_status_cols: list # List of original column names for special statuses
+                                ):
     # --- Red List Counts ---
-    # Assumes standard category codes exist in the renamed columns.
-    category_col = "Kategori (Rødliste/Fremmedart)" # Define the main category column name.
+    # Assumes standard category codes exist in the original category column.
+    # category_col is now a parameter (original name)
     # Count rows matching any redlist categories (Total).
     redlisted_total_count = data[category_col].isin(REDLIST_CATEGORIES).sum()
 
     # Calculate count for each specific red list category.
     redlist_counts_individual = {} # Initialize dictionary to store counts per category.
-    for category in REDLIST_CATEGORIES: # Iterate through the defined categories.
-        # Count rows where the category column exactly matches the current category.
-        redlist_counts_individual[category] = (data[category_col] == category).sum()
+    for category_value in REDLIST_CATEGORIES: # Iterate through the defined categories.
+        # Count rows where the category column exactly matches the current category_value.
+        redlist_counts_individual[category_value] = (data[category_col] == category_value).sum()
 
     # --- Alien Species Counts ---
-    alien_yes_col = "Fremmede arter kategori" # Define the dedicated 'Yes' column name for aliens.
+    # alien_flag_col is now a parameter (original name for 'Fremmede arter' type column)
 
     is_alien_category = data[category_col].isin(ALIEN_CATEGORIES_LIST)  # Check category column for risk codes.
-    is_alien_yes = data[alien_yes_col] == 'Yes'  # Check dedicated 'Yes' column.
+    is_alien_yes = data[alien_flag_col].astype(str).str.upper() == 'YES'  # Check dedicated alien flag column (original name), ensure robust comparison.
     alien_total_count = (is_alien_category | is_alien_yes).sum()  # Total alien count (either condition is true).
 
     # Calculate counts for each breakdown risk category
     alien_counts_individual = {} # Dictionary to store breakdown counts.
-    for category in ALIEN_CATEGORIES_LIST: # Iterate through risk categories.
-        alien_counts_individual[category] = (data[category_col] == category).sum() # Count matches in category column.
+    for category_value in ALIEN_CATEGORIES_LIST: # Iterate through risk categories.
+        alien_counts_individual[category_value] = (data[category_col] == category_value).sum() # Count matches in category column.
 
     # --- Other Special Status Counts ---
     special_status_counts = {} # Dictionary to store counts for other statuses.
-    for status_col in SPECIAL_STATUS_COLS: # Iterate through the status column names.
-        special_status_counts[status_col] = (data[status_col] == 'Yes').sum() # Count 'Yes' in the respective column.
+    for original_status_col_name in original_special_status_cols: # Iterate through the original status column names.
+        # Count 'Yes' (case-insensitive) in the respective original status column.
+        # Ensure the column is treated as string for robust 'Yes' check
+        if original_status_col_name in data.columns:
+            special_status_counts[original_status_col_name] = (data[original_status_col_name].astype(str).str.upper() == 'YES').sum()
+        else:
+            special_status_counts[original_status_col_name] = 0 # If column somehow missing, count as 0
 
     # Calculate Total for Special Status Section Title
     # Sum the individual 'Yes' counts calculated above.
@@ -53,11 +62,11 @@ def calculate_all_status_counts(data):
         "redlist_breakdown": redlist_counts_individual,
         "alien_total": alien_total_count,
         "alien_breakdown": alien_counts_individual,
-        "special_status_breakdown": special_status_counts,
+        "special_status_breakdown": special_status_counts, # Keys are original special status col names
         "special_status_total": total_special_status_count,
         # Include constants lists for reference by display functions if needed
         "redlist_categories_order": REDLIST_CATEGORIES,
         "alien_categories_order": ALIEN_CATEGORIES_LIST,
-        "special_status_cols_order": SPECIAL_STATUS_COLS,
+        "special_status_cols_order": original_special_status_cols, # Now contains original names
     }
     return counts # Return the dictionary of status counts. 

@@ -62,9 +62,37 @@ data_for_visning = apply_filters(innlastet_data) # Applies selected filters. Ass
 
 # --- Prepare Data for Dashboard ---
 data_for_dashboard = data_for_visning.copy() # Creates a copy for dashboard-specific modifications.
-data_for_dashboard.columns = [get_display_name(col) for col in data_for_dashboard.columns] # Renames columns for display.
 st.subheader("Nøkkeltall") # Subheader for the dashboard section.
-display_dashboard(data_for_dashboard) # Displays the dashboard. Assumes data_for_dashboard is correctly formatted.
+
+# --- Define Actual Original Column Names for Dashboard (sourced from column_mapping.py) --- 
+actual_original_category_col = "category" # Original name for Red List / Alien Risk categories.
+actual_original_alien_flag_col = "Fremmede arter" # Original name for the column indicating if a species is alien.
+
+actual_original_art_col = "preferredPopularName" # Original name for species art.
+actual_original_family_col = "FamilieNavn" # Original name for family.
+actual_original_observer_col = "collector" # Original name for observer/collector.
+actual_original_individual_count_col = "individualCount" # Original name for individual count.
+actual_original_event_date_col = "dateTimeCollected" # Original name for event date/time.
+
+actual_original_special_status_cols_list = [
+    "Prioriterte arter",
+    "Andre spesielt hensynskrevende arter",
+    "Ansvarsarter",
+    "Spesielle okologiske former"
+]
+
+# Updated call to display_dashboard, now passing defined original column names.
+display_dashboard(
+    data_for_dashboard, # Data now has original column names.
+    original_art_col=actual_original_art_col,
+    original_family_col=actual_original_family_col,
+    original_observer_col=actual_original_observer_col,
+    original_individual_count_col=actual_original_individual_count_col,
+    original_event_date_col=actual_original_event_date_col,
+    original_category_col=actual_original_category_col,
+    original_alien_flag_col=actual_original_alien_flag_col,
+    original_special_status_cols_list=actual_original_special_status_cols_list
+)
 
 # --- Define Alien Species Criteria ---
 alien_col = "Fremmede arter" # Original column name for the dedicated alien flag.
