@@ -25,7 +25,7 @@ global_utils/
 *   **Key Components:**
     *   `COLUMN_NAME_MAPPING` (dict): Stores the mapping from original names (keys) to display names (values).
     *   `get_display_name(original_name)` (function): Takes an original column name and returns the corresponding display name from the mapping, or the original name itself if no mapping exists.
-*   **Usage:** Imported by modules like `Oversikt.py` and dashboard components to rename DataFrame columns before displaying data to the user.
+*   **Usage:** Imported by modules like `Oversikt.py` to rename DataFrame columns before displaying data directly in tables. Also used internally by components like `mapper_streamlit/landingsside/dashboard.py` to rename calculated results (e.g., top lists) before passing them to formatting or UI display functions.
 
 ### 2. `filter_constants.py`
 
@@ -40,39 +40,25 @@ global_utils/
 
 *   **Purpose:** Handles the creation of filter widgets in the Streamlit sidebar.
 *   **Key Components:**
-    *   `display_filter_widgets(data)` (function):
-        *   Takes the initial (unfiltered) DataFrame (`data`) as input.
-        *   Creates various filter widgets in the `st.sidebar` (text search, taxonomy, status, date range).
-        *   Uses a helper `_display_multiselect` to reduce repetition for standard multiselect filters.
-        *   Dynamically populates filter options based on values present in the input `data`.
-        *   Links widgets to `st.session_state` using unique `key` arguments (e.g., `filter_familie`, `filter_start_date`).
-    *   `_display_multiselect(data, original_col_name, filter_key, display_label, options_filter_list=None)` (helper function): Creates a standard multiselect widget, handling column checks, unique value retrieval, optional pre-filtering of options, and display logic.
-*   **Usage:** Imported and called by pages like `Oversikt.py` to display the sidebar UI.
+    *   `display_filter_widgets(data)` (function): Takes initial data, creates widgets linked to session state.
+    *   `_display_multiselect(...)` (helper function): Creates standard multiselect widget.
+*   **Usage:** Imported and called by pages like `Oversikt.py`.
 
 ### 4. `filter_logic.py`
 
 *   **Purpose:** Applies the selected filter criteria (stored in session state) to the data.
 *   **Key Components:**
-    *   `apply_filters(data)` (function):
-        *   Takes a DataFrame (`data`) as input.
-        *   Reads the current selections for each filter from `st.session_state`.
-        *   Uses a helper `_apply_multiselect_filter` to reduce repetition for standard `.isin()` filters.
-        *   Applies filters sequentially (Taxonomy, Status, Date Range, Text Search).
-        *   Handles the specific logic for combined special status filtering and date range comparison.
-        *   Returns the filtered DataFrame.
-    *   `_apply_multiselect_filter(filtered_data, filter_key, original_col_name)` (helper function): Applies a standard `.isin()` filter based on session state for a given key and column.
-*   **Usage:** Imported and called by pages like `Oversikt.py` after displaying widgets to get the filtered data for display.
+    *   `apply_filters(data)` (function): Takes data, reads session state, applies filters, returns filtered data.
+    *   `_apply_multiselect_filter(...)` (helper function): Applies `.isin()` filter.
+*   **Usage:** Imported and called by pages like `Oversikt.py`.
 
 ### 5. `session_state_manager.py`
 
-*   **Purpose:** Ensures that user selections in the filter widgets persist even when navigating between different pages of the multi-page Streamlit application.
+*   **Purpose:** Ensures filter selections persist across pages.
 *   **Key Components:**
-    *   `PERSISTENT_FILTER_KEYS` (list): A list of all `st.session_state` keys used by the filter widgets in `filter_ui.py`.
-    *   `initialize_and_persist_filters()` (function):
-        *   Should be called at the **beginning** of each page script.
-        *   Initializes each key in `st.session_state` with an appropriate default if it doesn't exist.
-        *   Re-assigns the session state variable to itself to prevent widget state cleanup.
-*   **Usage:** The `initialize_and_persist_filters()` function is called once at the start of `Oversikt.py` and should be called similarly in any other page script.
+    *   `PERSISTENT_FILTER_KEYS` (list): Session state keys used by filters.
+    *   `initialize_and_persist_filters()` (function): Initializes/persists filter keys in session state.
+*   **Usage:** `initialize_and_persist_filters()` called at the start of each page script.
 
 ## Dependencies
 
@@ -83,24 +69,26 @@ global_utils/
 
 These modules are designed to work together:
 
-1.  A main page script (e.g., `Oversikt.py`) imports `initialize_and_persist_filters`, `display_filter_widgets` (from `filter_ui`), `apply_filters` (from `filter_logic`), and `get_display_name`.
+1.  A main page script (e.g., `Oversikt.py`) imports `initialize_and_persist_filters`, `display_filter_widgets`, `apply_filters`, and potentially `get_display_name`.
 2.  `initialize_and_persist_filters()` is called first.
-3.  Data is loaded.
+3.  Data is loaded (with original column names).
 4.  `display_filter_widgets()` is called with the loaded data.
-5.  `apply_filters()` is called with the loaded data.
-6.  `get_display_name()` is used to rename columns of the filtered data before display.
+5.  `apply_filters()` is called with the loaded data to get filtered data (still with original column names).
+6.  **Displaying Data:**
+    *   For direct display in tables on the main page (like in `Oversikt.py`), `get_display_name()` is typically used to rename columns of the filtered data *before* passing to `st.dataframe`.
+    *   For complex components like the dashboard (`mapper_streamlit/landingsside/dashboard.py`), the filtered data (with *original* names) is passed along with parameters specifying the relevant original column names. The component itself then uses `get_display_name` internally if needed before final rendering.
 
 ## Configuration Notes
 
-*   **Filter Keys:** Consistency between keys in `filter_ui.py` and `PERSISTENT_FILTER_KEYS` in `session_state_manager.py` is crucial.
-*   **Column Names:** `filter_ui.py` and `filter_logic.py` rely on *original* column names. `column_mapping.py` provides display names.
+*   **Filter Keys:** Consistency between keys in `filter_ui.py` and `PERSISTENT_FILTER_KEYS` is crucial.
+*   **Column Names:** `filter_ui.py` and `filter_logic.py` operate on *original* column names. `column_mapping.py` provides display names used for UI rendering.
 *   **Status Codes/Mappings:** Constants in `filter_constants.py` drive status filter options/logic.
 
 ## Current State & Future Improvements
 
-*   **Refactored Core:** Filter UI and logic are now separated for better modularity. Helper functions reduce some repetition.
-*   **Data-Driven Filters:** Most filter options are dynamically generated based on loaded data.
-*   **Minimal Implementation:** Modules still generally lack detailed docstrings, type hints, extensive error handling, and logging.
-*   **Linting:** Linting errors (formatting, etc.) likely still exist.
-*   **Optimization:** Date conversion in `filter_logic.py` could potentially be optimized.
+*   **Refactored Core:** Filter UI and logic are separated.
+*   **Data-Driven Filters:** Most filter options are dynamic.
+*   **Minimal Implementation:** Lack detailed docstrings, type hints, extensive error handling, logging.
+*   **Linting:** Errors likely exist.
+*   **Optimization:** Date conversion in filter logic could be reviewed.
 *   **Testing:** No unit tests currently exist.
