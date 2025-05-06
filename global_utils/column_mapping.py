@@ -1,5 +1,7 @@
 """Maps technical column names to user-friendly display names."""
 
+# ##### Constants #####
+
 COLUMN_NAME_MAPPING = {
     # Core Identification & Biology
     "scientificName": "Vitenskapelig Navn",
@@ -23,7 +25,7 @@ COLUMN_NAME_MAPPING = {
     "OrdenNavn": "Orden",
 
     # Event & Recording
-    "eventDate": "Dato", #Ikke bruk
+    "eventDate": "Dato",  # Ikke bruk
     "dateTimeCollected": "Innsamlingsdato/-tid",
     "recordedBy": "Registrert Av",
     "collector": "Innsamler/Observatør",
@@ -60,6 +62,10 @@ COLUMN_NAME_MAPPING = {
     "Trua arter": "Truede Arter",
     "Fredete arter": "Fredete Arter",
     "NT": "Nær Truet (NT)",
+
+    # Generic Aggregation Columns (from calculate_top_lists.py etc.)
+    "Antall_Observasjoner": "Antall Observasjoner",
+    "Sum_Individer": "Antall Individer",
 
     # Add other columns from your specific dataset if needed
 }

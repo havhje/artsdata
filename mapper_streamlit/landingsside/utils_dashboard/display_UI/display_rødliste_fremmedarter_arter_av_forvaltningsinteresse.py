@@ -16,8 +16,8 @@ def _display_single_status_category(col, label, count, top_list_df, show_top_lis
             # Call the aggregation formatter function.
             st.markdown(formatter_agg(top_list_df, title="", # Pass empty title, handled by section header.
                                     item_col='Art',
-                                    count_col='Antall_Observasjoner',
-                                    sum_col='Sum_Individer'))
+                                    count_col='Antall Observasjoner',
+                                    sum_col='Antall Individer'))
 
 # --- Function: display_all_status_sections ---
 # Displays sections for Red List, Alien Species, and Special Status counts and top lists.

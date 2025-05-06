@@ -20,7 +20,7 @@ def display_main_metrics_grid(metrics, top_lists, show_top_lists, formatters):
         # Conditionally display the Top 10 Species list (Frequency only)
         if show_top_lists:
             # Use the frequency formatter with the appropriate DataFrame and columns.
-            st.markdown(format_freq(top_lists['top_species_freq'], title="", item_col='Art', count_col='Antall_Observasjoner'))
+            st.markdown(format_freq(top_lists['top_species_freq'], title="", item_col='Art', count_col='Antall Observasjoner'))
 
     with col2: # Content for the second column (Total Individuals).
         st.metric(label="Totalt Antall Individer", value=f"{metrics['total_individuals']:,}".replace(',', ' ')) # Display total individuals sum with formatting.
@@ -38,7 +38,7 @@ def display_main_metrics_grid(metrics, top_lists, show_top_lists, formatters):
         # Conditionally display the Top 10 Families list (Frequency only)
         if show_top_lists:
              # Use the frequency formatter with the appropriate DataFrame and columns.
-             st.markdown(format_freq(top_lists['top_families_freq'], title="", item_col='Familie', count_col='Antall_Observasjoner'))
+             st.markdown(format_freq(top_lists['top_families_freq'], title="", item_col='Familie', count_col='Antall Observasjoner'))
 
     with col5: # Content for the fifth column (Unique Observers).
         st.metric(label="Unike Innsamlere/Observatører", value=f"{metrics['unique_observers']:,}".replace(',', ' ')) # Display unique observer count.
