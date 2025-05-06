@@ -1,5 +1,6 @@
 # ##### Imports #####
 import pandas as pd # Import pandas for data manipulation.
+import streamlit as st # Import Streamlit for caching.
 
 # ##### Calculation Functions #####
 
@@ -7,6 +8,7 @@ import pandas as pd # Import pandas for data manipulation.
 # Calculates basic summary statistics from the observation data.
 # Takes a pandas DataFrame 'data'.
 # Returns a dictionary containing total records, individuals, unique counts, and date range.
+@st.cache_data
 def calculate_basic_metrics(data):
     # Basic Counts & Sums
     total_records = len(data)  # Get total number of observations. Filter changes affect this.

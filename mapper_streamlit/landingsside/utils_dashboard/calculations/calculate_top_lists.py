@@ -1,5 +1,6 @@
 # ##### Imports #####
 import pandas as pd # Import pandas for data manipulation and aggregation.
+import streamlit as st # Import Streamlit for caching.
 
 # ##### Constants #####
 # These are duplicated from status counts but useful here for iterating
@@ -24,6 +25,7 @@ def _prepare_data_for_top_lists(data):
 # Calculates various Top N lists based on frequency and individual counts.
 # Takes a pandas DataFrame 'data' and optional 'top_n' integer.
 # Returns a dictionary containing all calculated top list DataFrames.
+@st.cache_data
 def calculate_all_top_lists(data, top_n=10):
     if data.empty: # Handle empty input DataFrame early.
         # Return a dictionary with empty DataFrames/structures matching expected output keys

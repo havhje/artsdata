@@ -1,6 +1,7 @@
 # ##### Imports #####
 import pandas as pd  # Import pandas for data manipulation.
 import logging      # Import logging module.
+import streamlit as st # Import Streamlit for caching.
 
 # --- Setup Logging ---
 # Get a logger instance for this module.
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 # ##### Calculation Function #####
 
-
+@st.cache_data
 def calculate_yearly_metrics(data, date_col_name: str, individuals_col_name: str):
     # --- Function: calculate_yearly_metrics ---
     # Calculates yearly sums of observations and individuals, and the average individuals per observation.

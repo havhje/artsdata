@@ -46,22 +46,3 @@ def display_main_metrics_grid(metrics, top_lists, show_top_lists, formatters):
         if show_top_lists:
             # Use the frequency formatter with the appropriate DataFrame and columns.
             st.markdown(format_freq(top_lists['top_observers_freq'], title="", item_col='Innsamler/Observatør', count_col='Antall Observasjoner'))
-
-# --- Function: display_date_range ---
-# Displays the observation period (first and last date).
-# Takes the metrics dictionary containing min_date and max_date.
-def display_date_range(metrics):
-    st.markdown("---") # Add a separator line before the date range.
-    st.markdown("##### Observasjonsperiode")  # Section title using markdown.
-    # Use columns for alignment, dates in first 2 columns.
-    date_col1, date_col2, _, _, _ = st.columns(5)
-
-    with date_col1:
-        # Format min date or show message if None.
-        min_date_str = metrics['min_date'].strftime('%Y-%m-%d') if metrics['min_date'] else "Ingen gyldig dato funnet" # Format or provide default text.
-        st.metric(label="Første Observasjonsdato", value=min_date_str)  # Display the earliest date found.
-
-    with date_col2:
-        # Format max date or show message if None.
-        max_date_str = metrics['max_date'].strftime('%Y-%m-%d') if metrics['max_date'] else "Ingen gyldig dato funnet" # Format or provide default text.
-        st.metric(label="Siste Observasjonsdato", value=max_date_str)  # Display the latest date found.

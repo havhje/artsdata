@@ -1,5 +1,6 @@
 # ##### Imports #####
 import pandas as pd # Import pandas for data manipulation.
+import streamlit as st # Import Streamlit for caching.
 
 # ##### Constants #####
 REDLIST_CATEGORIES = ['CR', 'EN', 'VU', 'NT', 'DD'] # Define redlist categories. Modifying affects counts.
@@ -12,6 +13,7 @@ SPECIAL_STATUS_COLS = ["Prioriterte Arter", "Andre Spes. Hensyn.", "Ansvarsarter
 # Calculates counts for Red List, Alien Species, and other special status categories.
 # Takes a pandas DataFrame 'data'.
 # Returns a dictionary containing various status counts.
+@st.cache_data
 def calculate_all_status_counts(data):
     # --- Red List Counts ---
     # Assumes standard category codes exist in the renamed columns.
