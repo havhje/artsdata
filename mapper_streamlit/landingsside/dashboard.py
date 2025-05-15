@@ -117,7 +117,7 @@ def display_dashboard(data,
         st.markdown("##### Kartleggingsstatestikk")
     with header_cols[1]:
         if st.button("Topp 10", key="toggle_all_dashboard_lists"): 
-             st.session_state.show_dashboard_top_lists = not st.session_state.show_dashboard_top_lists
+            st.session_state.show_dashboard_top_lists = not st.session_state.show_dashboard_top_lists
 
     display_main_metrics_grid(
         metrics=basic_metrics,
