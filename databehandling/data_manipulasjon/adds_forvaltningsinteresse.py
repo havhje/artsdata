@@ -1,19 +1,17 @@
 import pandas as pd
-from pathlib import Path  # Re-enabled as it will be used by the main script
+from pathlib import Path
 
 
 ##### Configuration #####
-# Column name for scientific names in the Excel file. Modify if source changes.
-EXCEL_SPECIES_COL = "Vitenskapelig_Navn"
-# Column name for scientific names in the CSV file. Modify if source changes.
-CSV_SPECIES_COL = "validScientificName"
+# Column name for scientific name IDs in the Excel file (fra Metadata).
+EXCEL_ID_COL = "ValidScientificNameId"
+# Column name for scientific name IDs in the input CSV file.
+CSV_ID_COL = "validScientificNameId"
+# Column name for scientific rank in the input CSV file.
+CSV_RANK_COL = "scientificNameRank"
 # 0-based index (5th col) in Excel where criteria cols start.
 # Adjust if Excel layout changes.
 CRITERIA_START_COL_INDEX = 4
-
-
-# The get_criteria_string function is removed as it's no longer needed.
-
 
 ##### Main Logic #####
 
@@ -25,67 +23,89 @@ def add_forvaltning_columns(
     output_path,  # Output CSV path.
 ):
     # --- Load data (Happy Path Only) ---
-    # Reads the first sheet by default. Assumes file exists and is valid.
     df_excel = pd.read_excel(excel_path)
-    # Assumes ';' separator. Assumes file exists and is valid.
     df_csv_cleaned = pd.read_csv(cleaned_csv_path, sep=";")
 
     # --- Identify and Prepare Criteria Columns from Excel ---
-    # Get columns starting from the defined index.
     potential_criteria_cols = df_excel.columns[CRITERIA_START_COL_INDEX:]
-    # Filter for columns that actually start with 'Kriterium'.
     criteria_cols = [col for col in potential_criteria_cols if col.startswith("Kriterium")]
 
-    # Set the species name as the index for easy mapping.
-    # Assumes EXCEL_SPECIES_COL exists and is suitable index.
-    df_excel_indexed = df_excel.set_index(EXCEL_SPECIES_COL)
+    # Ensure EXCEL_ID_COL exists
+    if EXCEL_ID_COL not in df_excel.columns:
+        raise ValueError(f"Excel ID column '{EXCEL_ID_COL}' not found in Excel file.")
 
-    # Create a DataFrame containing only the criteria columns with Yes/No.
+    df_excel_indexed = df_excel.set_index(EXCEL_ID_COL)
+
     df_criteria_bool = pd.DataFrame(index=df_excel_indexed.index)
     for col in criteria_cols:
-        # Check if column exists before processing
         if col in df_excel_indexed.columns:
-            # Convert 'X' (case-insensitive, stripped) to 'Yes', others 'No'.
             is_x = df_excel_indexed[col].astype(str).str.strip().str.upper()
             df_criteria_bool[col] = is_x.eq("X").map({True: "Yes", False: "No"})
-        # else: # Handle missing columns if needed, currently skipped
-        # print(f"Warning: Expected criteria column '{col}' not found.")
+        else:
+            # If a Kriterium col is expected but missing, fill with No for all species in Excel
+            df_criteria_bool[col] = "No"
 
-    # --- Merge Criteria into Cleaned CSV Data ---
-    # Merge based on species name. Keep all rows from the cleaned CSV.
-    # Assumes CSV_SPECIES_COL exists in df_csv_cleaned.
-    df_merged = pd.merge(
+    # --- Validate required columns in df_csv_cleaned ---
+    if CSV_RANK_COL not in df_csv_cleaned.columns:
+        raise ValueError(f"CSV rank column '{CSV_RANK_COL}' not found in cleaned CSV file.")
+    if CSV_ID_COL not in df_csv_cleaned.columns:
+        raise ValueError(f"CSV ID column '{CSV_ID_COL}' not found in cleaned CSV file.")
+
+    # --- Merge ALL CSV data with Excel criteria ---
+    # All rows from df_csv_cleaned are kept.
+    # If a match on CSV_ID_COL and df_criteria_bool.index occurs, criteria are merged.
+    # Otherwise, columns from df_criteria_bool will be NaN for that row.
+    df_processing = pd.merge(
         df_csv_cleaned,
         df_criteria_bool,
-        left_on=CSV_SPECIES_COL,  # Key from the left DataFrame (CSV)
-        right_index=True,  # Key from the right (Excel criteria map)
-        how="left",  # Keep all rows from left (CSV)
+        left_on=CSV_ID_COL,
+        right_index=True,
+        how="left",
+        indicator=True,  # To identify match status
     )
 
-    # --- Fill Missing Criteria ---
-    # Fill criteria columns with 'No' for species present in CSV
-    # but not in Excel map.
-    df_merged[criteria_cols] = df_merged[criteria_cols].fillna("No")
+    # --- Identify Rows for Logging ---
+    # Rows are logged if:
+    # 1. Their rank is not 'species' or 'subspecies' (higher ranks).
+    # 2. Their rank is 'species' or 'subspecies' BUT they didn't find a match in Excel.
+    ranks_to_match = ["species", "subspecies"]
+    is_higher_rank = ~df_processing[CSV_RANK_COL].isin(ranks_to_match)
+    is_unmatched_species_subspecies = df_processing[CSV_RANK_COL].isin(ranks_to_match) & (df_processing["_merge"] == "left_only")
+    log_mask = is_higher_rank | is_unmatched_species_subspecies
 
-    # --- Rename Criteria Columns ---
-    # Create a dictionary mapping old names to new names (strip prefix)
+    # --- Process DataFrame for Main Output (applies to all rows) ---
+    # Fill NaNs in the original criteria columns (from Excel) with "No".
+    # This handles higher ranks and unmatched species/subspecies.
+    df_processing[criteria_cols] = df_processing[criteria_cols].fillna("No")
+
     rename_mapping = {
-        # Strip 'Kriterium_' prefix (1st occurrence) and replace underscores
         col: col.replace("Kriterium_", "", 1).replace("_", " ")
         for col in criteria_cols
-        # Ensure column exists in merged df before adding to mapping
-        if col in df_merged.columns
+        # Ensure we only try to rename columns that actually exist after the merge
+        if col in df_processing.columns
     }
-    # Apply the renaming to the DataFrame.
-    df_merged = df_merged.rename(columns=rename_mapping)
+    df_processing.rename(columns=rename_mapping, inplace=True)
 
-    # The old logic for 'forvaltningsinteresse_kriterium' and
-    # 'is_forvaltningsinteresse' is replaced by the merge.
+    # Prepare the final main output DataFrame by dropping the merge indicator
+    df_main_output_to_save = df_processing.drop(columns=["_merge"])
 
-    # --- Save result ---
-    # Saves. Assumes output path is valid and writable.
-    df_merged.to_csv(output_path, index=False, sep=";")
-    # Return the output path (part of core function)
+    # Save the main processed file (contains all original rows)
+    df_main_output_to_save.to_csv(output_path, index=False, sep=";")
+    print(f"Processed data (all rows) saved to: {output_path}")
+
+    # --- Prepare and save log file for unmatched/higher_rank rows ---
+    # Select the rows to be logged from the fully processed DataFrame (df_main_output_to_save)
+    # using the log_mask.
+    df_log_data = df_main_output_to_save[log_mask].copy()
+
+    if not df_log_data.empty:
+        log_file_name = Path(output_path).stem + "_unmatched_log.csv"
+        log_output_path = Path(output_path).parent / log_file_name
+        df_log_data.to_csv(log_output_path, index=False, sep=";")
+        print(f"Log of {len(df_log_data)} unmatched/higher-rank rows saved to: {log_output_path}")
+    else:
+        print("No rows needed to be logged for unmatched/higher-rank status.")
+
     return output_path
 
 
