@@ -2,7 +2,10 @@ import pandas as pd
 from pathlib import Path
 
 
-##### Configuration #####
+# ----------------------------------------
+# Setter opp konstanter
+# ----------------------------------------
+
 # Column name for scientific name IDs in the Excel file (fra Metadata).
 EXCEL_ID_COL = "ValidScientificNameId"
 # Column name for scientific name IDs in the input CSV file.
@@ -13,10 +16,7 @@ CSV_RANK_COL = "scientificNameRank"
 # Adjust if Excel layout changes.
 CRITERIA_START_COL_INDEX = 4
 
-##### Main Logic #####
 
-
-## Function: add_forvaltning_columns ##
 def add_forvaltning_columns(
     cleaned_csv_path,  # Input CSV path.
     excel_path,  # Input Excel path.
@@ -26,13 +26,12 @@ def add_forvaltning_columns(
     df_excel = pd.read_excel(excel_path)
     df_csv_cleaned = pd.read_csv(cleaned_csv_path, sep=";")
 
-    # --- Identify and Prepare Criteria Columns from Excel ---
+    # ----------------------------------------
+    # Identify and Prepare Criteria Columns from Excel
+    # ----------------------------------------
+
     potential_criteria_cols = df_excel.columns[CRITERIA_START_COL_INDEX:]
     criteria_cols = [col for col in potential_criteria_cols if col.startswith("Kriterium")]
-
-    # Ensure EXCEL_ID_COL exists
-    if EXCEL_ID_COL not in df_excel.columns:
-        raise ValueError(f"Excel ID column '{EXCEL_ID_COL}' not found in Excel file.")
 
     df_excel_indexed = df_excel.set_index(EXCEL_ID_COL)
 
@@ -45,13 +44,9 @@ def add_forvaltning_columns(
             # If a Kriterium col is expected but missing, fill with No for all species in Excel
             df_criteria_bool[col] = "No"
 
-    # --- Validate required columns in df_csv_cleaned ---
-    if CSV_RANK_COL not in df_csv_cleaned.columns:
-        raise ValueError(f"CSV rank column '{CSV_RANK_COL}' not found in cleaned CSV file.")
-    if CSV_ID_COL not in df_csv_cleaned.columns:
-        raise ValueError(f"CSV ID column '{CSV_ID_COL}' not found in cleaned CSV file.")
-
-    # --- Merge ALL CSV data with Excel criteria ---
+    # ----------------------------------------
+    #   Merge DataFrames
+    # ----------------------------------------
     # All rows from df_csv_cleaned are kept.
     # If a match on CSV_ID_COL and df_criteria_bool.index occurs, criteria are merged.
     # Otherwise, columns from df_criteria_bool will be NaN for that row.
@@ -64,7 +59,10 @@ def add_forvaltning_columns(
         indicator=True,  # To identify match status
     )
 
-    # --- Identify Rows for Logging & Assign Reason ---
+    # ----------------------------------------
+    #   Logging and Output
+    # ----------------------------------------
+
     ranks_to_match = ["species", "subspecies"]
     is_higher_rank = ~df_processing[CSV_RANK_COL].isin(ranks_to_match)
     is_unmatched_species_subspecies = df_processing[CSV_RANK_COL].isin(ranks_to_match) & (df_processing["_merge"] == "left_only")
@@ -76,7 +74,10 @@ def add_forvaltning_columns(
     df_processing.loc[is_higher_rank, "log_reason"] = "Higher taxonomic rank"
     df_processing.loc[is_unmatched_species_subspecies, "log_reason"] = "Species/subspecies ID not found in Excel"
 
-    # --- Process DataFrame for Main Output (applies to all rows) ---
+    # ----------------------------------------
+    # Process and Save Data
+    # ----------------------------------------
+
     # Fill NaNs in the original criteria columns (from Excel) with "No".
     # This handles higher ranks and unmatched species/subspecies.
     df_processing[criteria_cols] = df_processing[criteria_cols].fillna("No")
@@ -96,7 +97,10 @@ def add_forvaltning_columns(
     df_main_output_to_save.to_csv(output_path, index=False, sep=";")
     print(f"Processed data (all rows) saved to: {output_path}")
 
-    # --- Prepare and save log file for unmatched/higher_rank rows ---
+    # ----------------------------------------
+    # Process and Save Log Data
+    # ----------------------------------------
+
     # Select the rows to be logged from the fully processed DataFrame (df_processing, which includes log_reason)
     # using the log_mask.
     df_log_data = df_processing[log_mask].copy()
