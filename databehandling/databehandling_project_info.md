@@ -25,6 +25,7 @@ databehandling/
 ├── output/                   # Directory for processed output files (created automatically)
 │   ├── fuglsortland_cleaned.csv    # Intermediate output after cleaning
 │   ├── fuglsortland_processed.csv  # Intermediate output after adding criteria
+│   ├── fuglsortland_processed_unmatched_log.csv # Log of unmatched/higher-rank taxa from criteria step
 │   └── fuglsortland_taxonomy.csv   # Final output with taxonomy
 ├── test_databehandling/        # Directory for test scripts
 │   └── api_test                  # Simple script to test API calls
@@ -40,7 +41,14 @@ The main script `behandling_main.py` controls the workflow:
 3.  **Step 1: Clean Columns**: Calls `cleans_columns.main()`, passing the raw input CSV path and the path for the cleaned output.
     *   `cleans_columns.py` loads the raw CSV, drops a predefined list of columns, processes the `individualCount` column (fills NaN with 1, converts to Int64), and saves the result.
 4.  **Step 2: Add Conservation Criteria**: Calls `adds_forvaltningsinteresse.main()`, passing the cleaned CSV path from Step 1, the Excel metadata path, and the path for the processed output.
-    *   `adds_forvaltningsinteresse.py` loads the cleaned CSV and the Excel file. It identifies criteria columns in Excel (starting with `Kriterium_`), converts the 'X' markers to 'Yes'/'No', merges these columns into the CSV based on scientific name, renames the criteria columns (removing prefix and replacing `_` with space), and saves the result.
+    *   `adds_forvaltningsinteresse.py` loads the cleaned CSV and the Excel file (specifically, the sheet defined by `EXCEL_SHEET_NAME`).
+    *   It identifies criteria columns in the Excel sheet (those starting with `CRITERIA_COL_PREFIX`, e.g., `Kriterium_`).
+    *   It converts the 'X' markers in these criteria columns to 'Yes' and fills any missing values (NaN) with 'No', ensuring all criteria cells have a clear 'Yes' or 'No'.
+    *   The script performs a **left merge** from the input CSV to the Excel criteria data, using `validScientificNameId` (defined by `CSV_ID_COL` and `EXCEL_ID_COL`) as the merge key. This ensures **all rows from the input CSV are retained** in the main processed output.
+    *   For rows in the input CSV that represent a **higher taxonomic rank** (i.e., `scientificNameRank` is not 'species' or 'subspecies') or for **species/subspecies whose `validScientificNameId` is not found** in the Excel criteria sheet, their conservation criteria columns in the main output are populated with "No".
+    *   These specific rows (higher rank or unmatched species/subspecies) are also **logged to a separate CSV file**. This log file includes a `log_reason` column indicating why the row was logged ("Higher taxonomic rank" or "Species/subspecies ID not found in Excel").
+    *   The criteria columns in the main output are renamed (removing the prefix and replacing `_` with a space).
+    *   The main processed DataFrame (with all original rows and added/updated criteria) is saved. The log DataFrame is saved to its own file.
 5.  **Step 3: Add Taxonomy**: Calls `api_artsdata.main()`, passing the processed CSV path from Step 2 and the path for the final output.
     *   `api_artsdata.py` loads the processed CSV. It identifies unique `validScientificNameId` values.
     *   For each unique ID, it calls the NorTaxa API (`/api/v1/TaxonName/ByScientificNameId/{id}`) to get species data.
@@ -105,14 +113,14 @@ To run the entire processing pipeline:
     *   `--metadata` (Optional): Path to the Excel file containing conservation criteria. Defaults to `databehandling/metadata_add/ArtslisteArtnasjonal_2023_01-31.xlsx` relative to the `databehandling` directory.
     *   `--output-dir` (Optional): Directory where the intermediate and final processed files will be saved. Defaults to `databehandling/output/` relative to the `databehandling` directory.
 
-Upon successful completion, the final output file (e.g., `input_file_taxonomy.csv`) will be located in the specified output directory, along with the intermediate files (`input_file_cleaned.csv`, `input_file_processed.csv`).
+Upon successful completion, the final output file (e.g., `input_file_taxonomy.csv`) will be located in the specified output directory, along with the intermediate files (`input_file_cleaned.csv`, `input_file_processed.csv`, and `input_file_processed_unmatched_log.csv`).
 
 ## Configuration Notes
 
 *   **File Paths/Names**: The *input* file path is now provided via command-line argument. Default paths for metadata and output directory are set in `behandling_main.py` but can be overridden via arguments. Output filenames are generated based on the input filename stem.
 *   **Column Names**: Key column names used for merging or processing (e.g., `validScientificNameId`, `Vitenskapelig_Navn`, `individualCount`) are defined as constants or used directly in the respective `.py` files within `data_manipulasjon/`. Adjust these if the source data schema changes.
 *   **Columns to Drop**: The list of columns removed in the cleaning step is hardcoded in `cleans_columns.py`.
-*   **Criteria Columns**: The logic for identifying and renaming criteria columns (prefix `Kriterium_`, start index) is in `adds_forvaltningsinteresse.py`.
+*   **Criteria Columns**: The logic for identifying and renaming criteria columns (prefix `CRITERIA_COL_PREFIX`, start index for renaming) is in `adds_forvaltningsinteresse.py`. The script now uses `validScientificNameId` for matching. It also generates a log file for entries that are of higher taxonomic rank or are species/subspecies not found in the criteria Excel file.
 *   **API Endpoint**: The NorTaxa API base URL is configured in `api_artsdata.py`.
 *   **Taxonomic Ranks**: The specific ranks extracted from the API are defined in `api_artsdata.py` (`desired_ranks`).
 

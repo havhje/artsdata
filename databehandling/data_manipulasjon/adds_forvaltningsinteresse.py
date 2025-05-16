@@ -64,14 +64,17 @@ def add_forvaltning_columns(
         indicator=True,  # To identify match status
     )
 
-    # --- Identify Rows for Logging ---
-    # Rows are logged if:
-    # 1. Their rank is not 'species' or 'subspecies' (higher ranks).
-    # 2. Their rank is 'species' or 'subspecies' BUT they didn't find a match in Excel.
+    # --- Identify Rows for Logging & Assign Reason ---
     ranks_to_match = ["species", "subspecies"]
     is_higher_rank = ~df_processing[CSV_RANK_COL].isin(ranks_to_match)
     is_unmatched_species_subspecies = df_processing[CSV_RANK_COL].isin(ranks_to_match) & (df_processing["_merge"] == "left_only")
+
     log_mask = is_higher_rank | is_unmatched_species_subspecies
+
+    # Initialize log_reason column
+    df_processing["log_reason"] = pd.NA
+    df_processing.loc[is_higher_rank, "log_reason"] = "Higher taxonomic rank"
+    df_processing.loc[is_unmatched_species_subspecies, "log_reason"] = "Species/subspecies ID not found in Excel"
 
     # --- Process DataFrame for Main Output (applies to all rows) ---
     # Fill NaNs in the original criteria columns (from Excel) with "No".
@@ -86,19 +89,22 @@ def add_forvaltning_columns(
     }
     df_processing.rename(columns=rename_mapping, inplace=True)
 
-    # Prepare the final main output DataFrame by dropping the merge indicator
-    df_main_output_to_save = df_processing.drop(columns=["_merge"])
+    # Prepare the final main output DataFrame by dropping the merge indicator and log_reason
+    df_main_output_to_save = df_processing.drop(columns=["_merge", "log_reason"])
 
     # Save the main processed file (contains all original rows)
     df_main_output_to_save.to_csv(output_path, index=False, sep=";")
     print(f"Processed data (all rows) saved to: {output_path}")
 
     # --- Prepare and save log file for unmatched/higher_rank rows ---
-    # Select the rows to be logged from the fully processed DataFrame (df_main_output_to_save)
+    # Select the rows to be logged from the fully processed DataFrame (df_processing, which includes log_reason)
     # using the log_mask.
-    df_log_data = df_main_output_to_save[log_mask].copy()
+    df_log_data = df_processing[log_mask].copy()
 
     if not df_log_data.empty:
+        # Drop the _merge column from the log data, keep log_reason
+        df_log_data = df_log_data.drop(columns=["_merge"])
+
         log_file_name = Path(output_path).stem + "_unmatched_log.csv"
         log_output_path = Path(output_path).parent / log_file_name
         df_log_data.to_csv(log_output_path, index=False, sep=";")
