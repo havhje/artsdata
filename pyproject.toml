@@ -28,6 +28,7 @@ dependencies = [
     "weaviate-client>=4.8.1",
     "pypdf>=5.4.0",
     "python-dotenv>=1.0.1",
+    "ipykernel>=6.29.5",
 ]
 
 # Use find with explicit where clause

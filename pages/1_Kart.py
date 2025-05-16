@@ -28,7 +28,6 @@ kart_data_filtrert = apply_filters(innlastet_data)
 # ----------------------------------------
 # Kart med punkter
 # ----------------------------------------
-
 st.title("Kart")
 options = ["Art", "Familie"]
 color_by = selection = st.pills("Farge etter", options, default="Art", selection_mode="single")
