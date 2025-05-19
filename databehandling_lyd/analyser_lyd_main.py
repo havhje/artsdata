@@ -32,6 +32,13 @@ output_csv_path.parent.mkdir(parents=True, exist_ok=True)
 # Define the output directory for split audio files
 split_audio_output_dir = script_dir / "data_output_lyd" / "lydfiler"
 
+# ---------------------------------------
+# Konfigurasjon for audiosplitting
+# ---------------------------------------
+
+# Set this flag to False if you want to skip audio splitting
+RUN_AUDIO_SPLITTING = False
+
 prepared_callback_function = functools.partial(on_analyze_directory_complete, base_input_path=input_directory_path)
 
 # ---------------------------------------
@@ -154,6 +161,12 @@ def enrich_detections_with_taxonomy(df: pd.DataFrame) -> pd.DataFrame:
     df["Order_ScientificName"] = order_sci_names_list
     df["Redlist_Status"] = redlist_status_list  # Assign the new column
 
+    # --- Process Redlist_Status to keep only the first value ---
+    # If Redlist_Status contains a comma, split by it and take the first part.
+    df["Redlist_Status"] = df["Redlist_Status"].apply(
+        lambda x: x.split(",")[0].strip() if isinstance(x, str) and "," in x else x
+    )
+
     # --- Now, handle Norwegian names for Family and Order ---
     # This requires a second pass: get unique Family/Order scientific names
     # then fetch their Artskart info to get their Norwegian popular names.
@@ -246,12 +259,15 @@ def main():
     except Exception as e:
         logging.error(f"Failed to save enriched detections to CSV: {e}", exc_info=True)
 
-    # After saving the CSV, split the audio files
-    if detections_df is not None and not detections_df.empty:
-        logging.info("Proceeding to split audio files based on detections.")
-        split_audio_by_detection(detections_df, split_audio_output_dir)  # Added call
+    # After saving the CSV, split the audio files if the flag is True
+    if RUN_AUDIO_SPLITTING:
+        if detections_df is not None and not detections_df.empty:
+            logging.info("Proceeding to split audio files based on detections.")
+            split_audio_by_detection(detections_df, split_audio_output_dir)  # Added call
+        else:
+            logging.info("Skipping audio splitting as there are no detections or DataFrame is empty.")
     else:
-        logging.info("Skipping audio splitting as there are no detections or DataFrame is empty.")
+        logging.info("Audio splitting is disabled by configuration.")
 
 
 if __name__ == "__main__":
