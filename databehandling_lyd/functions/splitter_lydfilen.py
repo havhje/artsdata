@@ -5,6 +5,7 @@ import logging
 # Import pydub
 from pydub import AudioSegment
 from pydub.exceptions import CouldntDecodeError
+from tqdm import tqdm
 
 def split_audio_by_detection(detections_df: pd.DataFrame, output_base_dir_path: Path):
     # Creates folders for each species and saves audio segments based on detections.
@@ -24,9 +25,15 @@ def split_audio_by_detection(detections_df: pd.DataFrame, output_base_dir_path: 
             logging.error(f"Missing required column '{col}' in detections DataFrame. Cannot proceed with splitting.")
             return
 
-    logging.info(f"Starting audio splitting process for {len(detections_df)} detections.")
+    logging.info(f"Starting audio splitting process for {len(detections_df)} detections (max 10 per species).")
 
-    for index, row in detections_df.iterrows():
+#-----------------
+# Setter maks antall segmenter per art
+#-----------------
+    species_segment_counts = {}  # Dictionary to track counts per species
+    MAX_SEGMENTS_PER_SPECIES = 10 # Define the cap
+
+    for index, row in tqdm(detections_df.iterrows(), total=detections_df.shape[0], desc="Splitting Audio Files", unit="segment"):
         original_file_path_str = row["filepath"]
         original_file_path = Path(original_file_path_str)
         start_time_seconds = row["start_time"]
@@ -42,6 +49,12 @@ def split_audio_by_detection(detections_df: pd.DataFrame, output_base_dir_path: 
             logging.warning(f"Skipping detection for '{original_filename_stem}' at {start_time_seconds}-{end_time_seconds}s due to missing Norwegian species name.")
             continue
         
+        # Check if the cap for this species has been reached
+        current_species_count = species_segment_counts.get(species_norwegian_name, 0)
+        if current_species_count >= MAX_SEGMENTS_PER_SPECIES:
+            # logging.debug(f"Max segments reached for {species_norwegian_name}. Skipping further segments for this species.") # Optional: for verbose logging
+            continue # Skip to the next detection
+
         # Sanitize species name for folder creation (replace spaces, special chars)
         # A more robust sanitization might be needed for other characters.
         sane_species_folder_name = species_norwegian_name.replace(" ", "_").replace("/", "_").replace("\\", "_")
@@ -65,6 +78,7 @@ def split_audio_by_detection(detections_df: pd.DataFrame, output_base_dir_path: 
             segment = sound[start_time_ms:end_time_ms]
             segment.export(output_segment_path, format="wav")
             logging.info(f"Successfully saved segment: {output_segment_path}")
+            species_segment_counts[species_norwegian_name] = current_species_count + 1 # Increment count for this species
         except CouldntDecodeError:
             logging.error(f"pydub CouldntDecodeError: Failed to load or decode '{original_file_path}'. Ensure ffmpeg is installed and the file is a valid audio format. Skipping this segment.")
         except FileNotFoundError:

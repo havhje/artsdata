@@ -13,7 +13,6 @@ from functions.artskart_api import (
 from functions.splitter_lydfilen import split_audio_by_detection # Added import
 import logging  # Import logging
 from tqdm import tqdm  # Import tqdm for progress bar
-
 # ----------------------------------------
 # Setup Logging
 # ----------------------------------------
@@ -36,7 +35,7 @@ output_csv_path = (
 output_csv_path.parent.mkdir(parents=True, exist_ok=True)
 
 # Define the output directory for split audio files
-split_audio_output_dir = script_dir / "lydfiler" # Changed from "lydfiler_per_art"
+split_audio_output_dir = script_dir / "data_output_lyd" / "lydfiler"
 
 prepared_callback_function = functools.partial(
     on_analyze_directory_complete, base_input_path=input_directory_path
@@ -235,7 +234,7 @@ def enrich_detections_with_taxonomy(df: pd.DataFrame) -> pd.DataFrame:
 def main():
     logging.info(f"Starting BirdNET analysis on input directory: {input_directory_path}")  # Log the input directory path
     all_detections_list = run_birdnet_analysis(input_directory_path, prepared_callback_function)
-    logging.info(f"Raw detections returned from BirdNET analysis: {all_detections_list}")  # Log the raw detections
+    # logging.info(f"Raw detections returned from BirdNET analysis: {all_detections_list}")  # Log the raw detections -- THIS LINE WILL BE COMMENTED OUT/REMOVED
 
     detections_df = initialize_dataframe(all_detections_list)
     if detections_df is None:
