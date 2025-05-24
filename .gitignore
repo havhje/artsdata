@@ -14,3 +14,7 @@ wheels/
 
 # Environment variables file
 .env
+
+# Ignore data folders
+databehandling_lyd/data_output_lyd/
+databehandling_lyd/data_input_lyd/
