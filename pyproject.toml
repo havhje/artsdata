@@ -7,7 +7,7 @@ name = "bareleker_species_app"
 version = "0.1.0"
 description = "Species data processing and Streamlit viewer."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "pandas",
     "openpyxl",
@@ -24,16 +24,16 @@ dependencies = [
     "numpy>=1.21.0",
     "requests>=2.32.3",
     "tqdm>=4.67.1",
-    "watchdog>=4.0.2",
     "weaviate-client>=4.8.1",
     "pypdf>=5.4.0",
     "python-dotenv>=1.0.1",
     "ipykernel>=6.29.5",
-    "birdnetlib>=0.0.8",
     "librosa>=0.11.0",
     "tensorflow>=2.9.0",
     "pydub>=0.25.1",
     "pygwalker>=0.4.9.15",
+    "birdnetlib==0.18.0",
+    "resampy",
 ]
 
 # Use find with explicit where clause

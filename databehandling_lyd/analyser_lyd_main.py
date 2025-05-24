@@ -37,7 +37,7 @@ split_audio_output_dir = script_dir / "data_output_lyd" / "lydfiler"
 # ---------------------------------------
 
 # Set this flag to False if you want to skip audio splitting
-RUN_AUDIO_SPLITTING = False
+RUN_AUDIO_SPLITTING = True
 
 prepared_callback_function = functools.partial(on_analyze_directory_complete, base_input_path=input_directory_path)
 
