@@ -41,31 +41,45 @@ def check_missing_popular_names(input_csv_path: Path, output_csv_path: Path) -> 
             df.to_csv(output_csv_path, sep=';', index=False, encoding='utf-8-sig')
             return output_csv_path
             
+        # Group missing rows by scientific name to avoid duplicate prompts
+        unique_missing_species = missing_rows['validScientificName'].unique()
+        
         print(f"\nFound {len(missing_rows)} rows with missing preferredPopularName values.")
+        print(f"Found {len(unique_missing_species)} unique species missing popular names.")
         print("Please provide popular names for the following species:")
         print("Commands: Enter name, 's' to skip, 'q' to quit\n")
         
         changes_made = 0
+        species_mapping = {}  # Store user responses for each species
         
-        for idx, row in missing_rows.iterrows():
-            scientific_name = row['validScientificName']
+        # First, collect popular names for each unique species
+        for scientific_name in unique_missing_species:
+            count = len(missing_rows[missing_rows['validScientificName'] == scientific_name])
             
             while True:
-                response = input(f"Scientific name: '{scientific_name}' - Enter popular name (or 's'/'q'): ").strip()
+                response = input(f"Scientific name: '{scientific_name}' ({count} rows) - Enter popular name (or 's'/'q'): ").strip()
                 
                 if response.lower() == 'q':
                     print("Operation cancelled by user.")
                     return None
                 elif response.lower() == 's':
                     print("Skipped.")
+                    species_mapping[scientific_name] = None  # Mark as skipped
                     break
                 elif response:
-                    df.at[idx, 'preferredPopularName'] = response
-                    changes_made += 1
-                    print(f"Added: '{response}'")
+                    species_mapping[scientific_name] = response
+                    print(f"Will apply '{response}' to {count} rows")
                     break
                 else:
                     print("Please enter a valid name, 's' to skip, or 'q' to quit.")
+        
+        # Apply the collected popular names to all matching rows
+        for scientific_name, popular_name in species_mapping.items():
+            if popular_name is not None:  # Skip if user chose to skip this species
+                matching_rows = df['validScientificName'] == scientific_name
+                missing_matching_rows = matching_rows & missing_mask
+                df.loc[missing_matching_rows, 'preferredPopularName'] = popular_name
+                changes_made += len(df[missing_matching_rows])
         
         # Save the updated dataframe
         print(f"\nSaving updated CSV with {changes_made} changes to: {output_csv_path}")
