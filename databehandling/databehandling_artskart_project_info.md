@@ -59,59 +59,35 @@ The main script `behandling_main.py` controls the workflow:
     * It saves the final enriched DataFrame.
 6. **Completion**: If all steps complete successfully, `behandling_main.py` prints a success message indicating the final output file path.
 
-## Setup
 
-### Dependencies
+# Basic usage (using default metadata and output directory with uv)
+uv run -- python databehandling/behandling_main.py databehandling/input_artsdata/Andøya_fugl.csv
 
-This pipeline relies on the following Python libraries:
+# Specifying metadata file with uv
+uv run -- python databehandling/behandling_main.py path/to/your/input_file.csv --metadata path/to/your/metadata.xlsx
 
-*   `pandas`: For data manipulation and CSV/Excel handling.
-*   `requests`: For making HTTP calls to the NorTaxa API.
-*   `tqdm`: For displaying a progress bar during API calls.
+# Specifying output directory with uv
+uv run -- python databehandling/behandling_main.py path/to/your/input_file.csv --output-dir path/to/your/output
 
-### Installation (using uv)
+# Specifying both with uv
+uv run -- python databehandling/behandling_main.py path/to/your/input_file.csv --metadata path/to/your/metadata.xlsx --output-dir path/to/your/output
 
-It is recommended to use `uv` for package management. Ensure `uv` is installed. Then, from the workspace root (`artsdata` directory), run:
-
-```bash
-uv add pandas requests tqdm
+# Example with a specific input file path (Andøya_fugl.csv) from the workspace root (using uv)
+uv run -- python databehandling/behandling_main.py databehandling/input_artsdata/Andøya_fugl.csv
 ```
 
-Alternatively, if using `pip` and `venv`:
+**Command-line arguments:**
 
-```bash
-python -m venv .venv
-source .venv/bin/activate # Or .\venv\Scripts\activate on Windows
-pip install pandas requests tqdm
-```
+*   `input_file.csv`: **(Required)** The path to the raw CSV data you want to process.
+*   `--metadata` (Optional): Path to the Excel file containing conservation criteria. Defaults to `databehandling/metadata_add/ArtslisteArtnasjonal_2023_01-31.xlsx` relative to the `databehandling` directory.
+*   `--output-dir` (Optional): Directory where the intermediate and final processed files will be saved. Defaults to `databehandling/output/` relative to the `databehandling` directory.
 
-## Usage
-
-To run the entire processing pipeline:
+**Prerequisites before running:**
 
 1.  ~~Ensure the required input file (`fuglsortland.csv` or similar) is placed in the `databehandling/input_artsdata/` directory.~~ (This is no longer necessary as the input file is specified as an argument).
 2.  Ensure the required Excel metadata file (e.g., `ArtslisteArtnasjonal_2023_01-31.xlsx`) exists at the location specified by the `--metadata` argument (or its default location in `databehandling/metadata_add/`).
 3.  Make sure the dependencies are installed (see Setup).
-4.  Navigate to the workspace root directory (`artsdata`) in your terminal.
-5.  Run the main script, providing the path to the input CSV file as the first argument. You can optionally specify the metadata file and output directory:
-
-    ```bash
-    # Basic usage (using default metadata and output directory)
-    python databehandling/behandling_main.py path/to/your/input_file.csv
-
-    # Specifying metadata file
-    python databehandling/behandling_main.py path/to/your/input_file.csv --metadata path/to/your/metadata.xlsx
-
-    # Specifying output directory
-    python databehandling/behandling_main.py path/to/your/input_file.csv --output-dir path/to/your/output
-
-    # Specifying both
-    python databehandling/behandling_main.py path/to/your/input_file.csv --metadata path/to/your/metadata.xlsx --output-dir path/to/your/output
-    ```
-
-    *   `input_file.csv`: **(Required)** The path to the raw CSV data you want to process.
-    *   `--metadata` (Optional): Path to the Excel file containing conservation criteria. Defaults to `databehandling/metadata_add/ArtslisteArtnasjonal_2023_01-31.xlsx` relative to the `databehandling` directory.
-    *   `--output-dir` (Optional): Directory where the intermediate and final processed files will be saved. Defaults to `databehandling/output/` relative to the `databehandling` directory.
+4.  Ensure you have navigated to the workspace root directory (`artsdata`) in your terminal before running the commands above.
 
 Upon successful completion, the final output file (e.g., `input_file_taxonomy.csv`) will be located in the specified output directory, along with the intermediate files (`input_file_cleaned.csv`, `input_file_processed.csv`, and `input_file_processed_unmatched_log.csv`).
 
